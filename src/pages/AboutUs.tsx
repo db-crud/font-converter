@@ -49,12 +49,12 @@ export const AboutUs: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen py-12 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Page Title */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">
           About Us
         </h1>
         <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Nepali Converter is a high-precision, online utility designed to make Nepali text conversion fast, reliable, and accessible to everyone.
+          Font Converter is a high-precision, online utility designed to make Nepali text conversion fast, reliable, and accessible to everyone.
         </p>
       </div>
 

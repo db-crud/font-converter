@@ -84,9 +84,6 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
           <h2 className="text-lg font-bold text-slate-900 dark:text-white font-heading tracking-tight">
             {title}
           </h2>
-          <span className="hidden sm:inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-blue-100/70 dark:bg-blue-950 text-blue-700 dark:text-blue-300">
-            Real-time Auto Conversion
-          </span>
         </div>
 
         {onSwapDirection && (
@@ -145,8 +142,8 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
               value={inputText}
               onChange={handleInputChange}
               placeholder={inputPlaceholder}
-              rows={12}
-              className={`w-full h-full min-h-[260px] p-4 text-base rounded-2xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 transition-all leading-relaxed resize-y ${
+              rows={7}
+              className={`w-full h-full min-h-[170px] p-3.5 text-base rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 transition-all leading-relaxed resize-y ${
                 isPreetiInput && renderPreetiInputFont
                   ? 'font-preeti text-xl tracking-wide'
                   : isPreetiInput
@@ -226,8 +223,8 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
               value={outputText}
               readOnly
               placeholder="Converted output will appear here in real time..."
-              rows={12}
-              className={`w-full h-full min-h-[260px] p-4 rounded-2xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed resize-y select-all ${
+              rows={7}
+              className={`w-full h-full min-h-[170px] p-3.5 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed resize-y select-all ${
                 isPreetiOutput && renderPreetiFont
                   ? 'font-preeti text-2xl tracking-wide text-slate-900 dark:text-slate-100'
                   : isPreetiOutput

@@ -1,24 +1,17 @@
 import React from 'react';
 import { ConverterCard } from '../components/ConverterCard';
 import { preetiToUnicode } from '../converter/converter';
-import { Sparkles, FileText, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
+import { FileText, CheckCircle2, AlertTriangle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const PreetiToUnicode: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen py-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col min-h-screen py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 text-xs font-semibold mb-3 border border-indigo-200 dark:border-indigo-800">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-          <span>Legacy Font Modernizer</span>
-        </div>
+      <div className="text-center mb-6">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">
           Preeti to Unicode Converter
         </h1>
-        <p className="mt-2 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          Convert Preeti encoded text into modern Nepali Unicode.
-        </p>
       </div>
 
       {/* Converter Card */}
@@ -27,7 +20,7 @@ export const PreetiToUnicode: React.FC = () => {
           title="Preeti to Unicode Converter"
           inputLabel="Preeti Text (Left: Paste / Type)"
           outputLabel="Unicode Text (Right: Devanagari)"
-          inputPlaceholder="Type or paste Preeti encoded text here (e.g. g]kfn, gd:t], ljBfno)..."
+          inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
           convertFn={preetiToUnicode}
           downloadFilename="unicode-text.txt"
           isPreetiInput={true}

@@ -14,7 +14,7 @@ export const Footer: React.FC = () => {
                 <span className="font-nepali text-lg font-bold">ने</span>
               </div>
               <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-heading">
-                Nepali Converter
+                Font Converter
               </span>
             </Link>
             <p className="text-slate-600 dark:text-slate-400 text-sm max-w-sm leading-relaxed">
@@ -81,7 +81,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© 2026 Nepali Converter. All rights reserved.</p>
+          <p>© 2026 Font Converter. All rights reserved.</p>
           <p className="flex items-center gap-1">
             Built for modern Nepali computing <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />
           </p>

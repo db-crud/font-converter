@@ -5,7 +5,8 @@ import { CopyButton } from '../components/CopyButton';
 import { ClearButton } from '../components/ClearButton';
 import { DownloadButton } from '../components/DownloadButton';
 import { PasteButton } from '../components/PasteButton';
-import { Keyboard, Sparkles, BookOpen } from 'lucide-react';
+import { Keyboard, BookOpen } from 'lucide-react';
+
 
 
 
@@ -60,16 +61,9 @@ export const TypeInNepali: React.FC = () => {
     <div className="flex flex-col min-h-screen py-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-3 border border-blue-200 dark:border-blue-800">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Smart Phonetic Transliteration</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">
           Type in Nepali
         </h1>
-        <p className="mt-2 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          Type Nepali Unicode text easily.
-        </p>
 
         {/* Quick Sample Suggestions */}
         <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
@@ -143,8 +137,8 @@ export const TypeInNepali: React.FC = () => {
                 value={romanText}
                 onChange={handleRomanChange}
                 placeholder="Type here in Romanized English (e.g., namaste sathi, mero naam dan ho, nepal sundar desh ho)..."
-                rows={10}
-                className="w-full flex-1 p-3.5 text-base rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono resize-y"
+                rows={7}
+                className="w-full flex-1 min-h-[170px] p-3.5 text-base rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono resize-y"
               />
               <div className="mt-3 text-xs text-slate-400 dark:text-slate-500">
                 Tip: Type in phonetic English and the Nepali Unicode will appear on the right!
@@ -156,9 +150,6 @@ export const TypeInNepali: React.FC = () => {
               <div className="flex items-center justify-between mb-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                   <span>Nepali Unicode Output</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
-                    real-time
-                  </span>
                 </label>
                 <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
                   <span>Characters: {charCount}</span>
@@ -170,8 +161,8 @@ export const TypeInNepali: React.FC = () => {
                 value={nepaliText}
                 onChange={(e) => setNepaliText(e.target.value)}
                 placeholder="नेपाली युनिकोड यहाँ स्वतः देखा पर्नेछ..."
-                rows={10}
-                className="w-full flex-1 p-3.5 text-lg rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-nepali leading-relaxed resize-y select-all"
+                rows={7}
+                className="w-full flex-1 min-h-[170px] p-3.5 text-lg rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 font-nepali leading-relaxed resize-y select-all"
               />
               {/* Output Actions */}
               <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between flex-wrap gap-2">

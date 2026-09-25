@@ -35,7 +35,7 @@ export const Navbar: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white font-heading leading-tight">
-                Nepali Converter
+                Font Converter
               </span>
               <span className="text-[10px] font-medium uppercase tracking-wider text-blue-600 dark:text-blue-400">
                 Preeti ↔ Unicode

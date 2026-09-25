@@ -25,35 +25,19 @@ export const Home: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen">
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden pt-10 pb-8 sm:pt-14 sm:pb-10 bg-gradient-to-b from-blue-50/60 via-slate-50 to-slate-50 dark:from-slate-900/80 dark:via-slate-950 dark:to-slate-950 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+      <section className="relative overflow-hidden pt-8 pb-4 sm:pt-10 sm:pb-6 bg-gradient-to-b from-blue-50/60 via-slate-50 to-slate-50 dark:from-slate-900/80 dark:via-slate-950 dark:to-slate-950 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100/80 dark:bg-blue-950/80 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-4 border border-blue-200 dark:border-blue-800 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Fast, 100% Client-Side Nepali Conversion</span>
-          </div>
-
-          {/* Hero Heading */}
+          {/* Main Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight max-w-4xl mx-auto leading-tight">
-            Nepali Unicode ↔ Preeti Converter
+            Font Converter
           </h1>
-
-          {/* Subtitle */}
-          <p className="mt-3 text-lg sm:text-xl font-medium text-slate-700 dark:text-slate-300 max-w-2xl mx-auto">
-            Convert Nepali text easily between Unicode and Preeti.
-          </p>
-
-          {/* Short Description */}
-          <p className="mt-2 text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Fast, simple and accurate Nepali text conversion with automatic real-time conversion.
-          </p>
         </div>
       </section>
 
       {/* MAIN CONVERTER SECTION — LEFT (INPUT) & RIGHT (OUTPUT) */}
-      <section className="py-8 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
+      <section className="py-6 sm:py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
         {/* Converter Mode Tabs */}
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
           <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
             <button
               onClick={() => setActiveMode('u2p')}
@@ -101,10 +85,10 @@ export const Home: React.FC = () => {
         {/* Display based on active mode */}
         {activeMode === 'u2p' && (
           <ConverterCard
-            title="Unicode to Preeti Converter"
-            inputLabel="Unicode Text (Left: Paste / Type)"
-            outputLabel="Preeti Output (Right: Preeti Font)"
-            inputPlaceholder="Type or paste Nepali Unicode text here (e.g. नमस्ते, नेपाल, काठमाडौं)..."
+            title="Unicode to Preeti"
+            inputLabel="Unicode Text"
+            outputLabel="Preeti Output"
+            inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
             convertFn={unicodeToPreeti}
             downloadFilename="preeti-text.txt"
             onSwapDirection={toggleDirection}
@@ -115,10 +99,10 @@ export const Home: React.FC = () => {
 
         {activeMode === 'p2u' && (
           <ConverterCard
-            title="Preeti to Unicode Converter"
-            inputLabel="Preeti Text (Left: Paste / Type)"
-            outputLabel="Unicode Output (Right: Devanagari)"
-            inputPlaceholder="Type or paste Preeti encoded text here (e.g. g]kfn, gd:t], ljBfno)..."
+            title="Preeti to Unicode"
+            inputLabel="Preeti Text"
+            outputLabel="Unicode Output"
+            inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
             convertFn={preetiToUnicode}
             downloadFilename="unicode-text.txt"
             onSwapDirection={toggleDirection}
@@ -131,9 +115,9 @@ export const Home: React.FC = () => {
           <div className="space-y-8">
             <ConverterCard
               title="Unicode to Preeti"
-              inputLabel="Unicode Text (Left: Paste / Type)"
-              outputLabel="Preeti Output (Right: Preeti Font)"
-              inputPlaceholder="Type or paste Unicode text here..."
+              inputLabel="Unicode Text"
+              outputLabel="Preeti Output"
+              inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
               convertFn={unicodeToPreeti}
               downloadFilename="preeti-text.txt"
               isPreetiInput={false}
@@ -141,9 +125,9 @@ export const Home: React.FC = () => {
             />
             <ConverterCard
               title="Preeti to Unicode"
-              inputLabel="Preeti Text (Left: Paste / Type)"
-              outputLabel="Unicode Output (Right: Devanagari)"
-              inputPlaceholder="Type or paste Preeti text here..."
+              inputLabel="Preeti Text"
+              outputLabel="Unicode Output"
+              inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
               convertFn={preetiToUnicode}
               downloadFilename="unicode-text.txt"
               isPreetiInput={true}

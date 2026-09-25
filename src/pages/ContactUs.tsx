@@ -46,8 +46,8 @@ export const ContactUs: React.FC = () => {
   };
 
   const handleMailto = () => {
-    const mailtoUrl = `mailto:support@nepaliconverter.local?subject=${encodeURIComponent(
-      formData.subject || 'Nepali Converter Feedback'
+    const mailtoUrl = `mailto:support@fontconverter.local?subject=${encodeURIComponent(
+      formData.subject || 'Font Converter Feedback'
     )}&body=${encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
     )}`;

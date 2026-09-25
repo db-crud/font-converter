@@ -1,24 +1,17 @@
 import React from 'react';
 import { ConverterCard } from '../components/ConverterCard';
 import { unicodeToPreeti } from '../converter/converter';
-import { Sparkles, Printer, Layers, HelpCircle, ArrowRight } from 'lucide-react';
+import { Printer, Layers, HelpCircle, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const UnicodeToPreeti: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen py-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col min-h-screen py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-950/70 text-blue-700 dark:text-blue-300 text-xs font-semibold mb-3 border border-blue-200 dark:border-blue-800">
-          <Sparkles className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-          <span>Publishing & Legacy Export</span>
-        </div>
+      <div className="text-center mb-6">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">
           Unicode to Preeti Converter
         </h1>
-        <p className="mt-2 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-          Convert modern Nepali Unicode text into Preeti encoding.
-        </p>
       </div>
 
       {/* Converter Card */}
@@ -27,7 +20,7 @@ export const UnicodeToPreeti: React.FC = () => {
           title="Unicode to Preeti Converter"
           inputLabel="Unicode Text (Left: Paste / Type)"
           outputLabel="Preeti Output (Right: Preeti Font)"
-          inputPlaceholder="Type or paste modern Nepali Unicode text here (e.g. नमस्ते, नेपाल सरकार, काठमाडौं)..."
+          inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
           convertFn={unicodeToPreeti}
           downloadFilename="preeti-text.txt"
           isPreetiInput={false}
