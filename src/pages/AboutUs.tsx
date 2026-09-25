@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import {
   Globe,
   FileText,
@@ -11,8 +12,9 @@ import {
   Database
 } from 'lucide-react';
 
-
 export const AboutUs: React.FC = () => {
+  const { about } = useSiteSettings();
+
   const useCases = [
     {
       title: 'Old Documents & Archives',
@@ -51,10 +53,10 @@ export const AboutUs: React.FC = () => {
       {/* Page Title */}
       <div className="text-center mb-8">
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">
-          About Us
+          {about.pageTitle}
         </h1>
         <p className="mt-3 text-base sm:text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-          Font Converter is a high-precision, online utility designed to make Nepali text conversion fast, reliable, and accessible to everyone.
+          {about.pageSubtitle}
         </p>
       </div>
 
@@ -62,23 +64,23 @@ export const AboutUs: React.FC = () => {
       <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-lg mb-12 relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-4">
-            Preserving & Modernizing Nepali Typography
+            {about.missionTitle}
           </h2>
           <p className="text-emerald-50 text-base leading-relaxed mb-6">
-            Nepal’s digital heritage contains millions of documents written in legacy font encodings like Preeti, Kantipur, and Sagarmatha. Developed by Motherland IT Tech Pvt. Ltd., our mission is to bridge the gap between historic typography and modern digital systems with zero friction and absolute privacy.
+            {about.missionDescription}
           </p>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-emerald-400/30 text-xs sm:text-sm">
             <div>
-              <div className="font-extrabold text-xl sm:text-2xl text-white">100%</div>
-              <div className="text-emerald-100">Client-Side Logic</div>
+              <div className="font-extrabold text-xl sm:text-2xl text-white">{about.stat1Value}</div>
+              <div className="text-emerald-100">{about.stat1Label}</div>
             </div>
             <div>
-              <div className="font-extrabold text-xl sm:text-2xl text-white">0 ms</div>
-              <div className="text-emerald-100">Server Latency</div>
+              <div className="font-extrabold text-xl sm:text-2xl text-white">{about.stat2Value}</div>
+              <div className="text-emerald-100">{about.stat2Label}</div>
             </div>
             <div>
-              <div className="font-extrabold text-xl sm:text-2xl text-white">Free</div>
-              <div className="text-emerald-100">Forever For Everyone</div>
+              <div className="font-extrabold text-xl sm:text-2xl text-white">{about.stat3Value}</div>
+              <div className="text-emerald-100">{about.stat3Label}</div>
             </div>
           </div>
         </div>

@@ -52,6 +52,11 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/downloads" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                  Download Fonts
+                </Link>
+              </li>
+              <li>
                 <Link to="/type-in-nepali" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Type in Nepali
                 </Link>
@@ -73,6 +78,11 @@ export const Footer: React.FC = () => {
               <li>
                 <Link to="/contact-us" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link to="/admin" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                  Admin Dashboard
                 </Link>
               </li>
             </ul>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ConverterCard } from '../components/ConverterCard';
 import { unicodeToPreeti, preetiToUnicode } from '../converter/converter';
+import { useSiteSettings } from '../context/SiteSettingsContext';
 import {
   Zap,
   CheckCircle2,
@@ -15,6 +16,7 @@ import {
 import { Link } from 'react-router-dom';
 
 export const Home: React.FC = () => {
+  const { hero } = useSiteSettings();
   // Mode: 'u2p' (Unicode to Preeti), 'p2u' (Preeti to Unicode), or 'both'
   const [activeMode, setActiveMode] = useState<'u2p' | 'p2u' | 'both'>('u2p');
 
@@ -29,23 +31,23 @@ export const Home: React.FC = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Main Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight leading-tight">
-            Font Converter
+            {hero.title}
           </h1>
 
           {/* Subtitle / Barrier statement */}
           <p className="mt-3 text-base sm:text-lg md:text-xl font-semibold text-emerald-700 dark:text-emerald-400">
-            Breaking the barrier between traditional Nepali fonts and the modern digital world.
+            {hero.subtitle}
           </p>
 
           {/* Description */}
           <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mx-auto">
-            Convert your Nepali text seamlessly between Preeti and Unicode with speed, accuracy, and simplicity. Whether you&apos;re working with legacy documents, school records, official files, or creating content for the modern web, <strong className="font-semibold text-slate-900 dark:text-white">Nepali Converter</strong> makes the transition effortless.
+            {hero.description}
           </p>
 
           {/* Proudly Built in Nepal Badge */}
           <div className="mt-4 sm:mt-5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 border border-emerald-200 dark:border-emerald-800/80 shadow-xs text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200">
-            <span>Proudly built in Nepal 🇳🇵 by</span>
-            <span className="font-bold text-emerald-700 dark:text-emerald-400">Motherland IT Tech Pvt. Ltd.</span>
+            <span>{hero.badgePrefix}</span>
+            <span className="font-bold text-emerald-700 dark:text-emerald-400">{hero.companyName}</span>
           </div>
         </div>
       </section>
@@ -104,7 +106,7 @@ export const Home: React.FC = () => {
             title="Unicode to Preeti"
             inputLabel="Unicode Text"
             outputLabel="Preeti Text"
-            inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
+            inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्।"
             convertFn={unicodeToPreeti}
             downloadFilename="preeti-text.txt"
             onSwapDirection={toggleDirection}
@@ -118,7 +120,7 @@ export const Home: React.FC = () => {
             title="Preeti to Unicode"
             inputLabel="Preeti Text"
             outputLabel="Unicode Text"
-            inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
+            inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्।"
             convertFn={preetiToUnicode}
             downloadFilename="unicode-text.txt"
             onSwapDirection={toggleDirection}
@@ -133,7 +135,7 @@ export const Home: React.FC = () => {
               title="Unicode to Preeti"
               inputLabel="Unicode Text"
               outputLabel="Preeti Text"
-              inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
+              inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्।"
               convertFn={unicodeToPreeti}
               downloadFilename="preeti-text.txt"
               isPreetiInput={false}
@@ -143,7 +145,7 @@ export const Home: React.FC = () => {
               title="Preeti to Unicode"
               inputLabel="Preeti Text"
               outputLabel="Unicode Text"
-              inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
+              inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्।"
               convertFn={preetiToUnicode}
               downloadFilename="unicode-text.txt"
               isPreetiInput={true}

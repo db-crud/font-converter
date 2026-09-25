@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Send, CheckCircle2, Info, MapPin } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
-
+import { useSiteSettings } from '../context/SiteSettingsContext';
 
 export const ContactUs: React.FC = () => {
   const { showToast } = useToast();
+  const { contact, addMessage } = useSiteSettings();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -40,13 +41,20 @@ export const ContactUs: React.FC = () => {
       return;
     }
 
-    // Mark as submitted and show transparent notice
+    // Save message to Admin dashboard storage
+    addMessage({
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      subject: formData.subject.trim(),
+      message: formData.message.trim(),
+    });
+
     setSubmitted(true);
-    showToast('Feedback recorded! (Client-side demo mode)', 'success');
+    showToast('Feedback submitted and recorded in Admin Dashboard!', 'success');
   };
 
   const handleMailto = () => {
-    const mailtoUrl = `mailto:support@fontconverter.local?subject=${encodeURIComponent(
+    const mailtoUrl = `mailto:${contact.email}?subject=${encodeURIComponent(
       formData.subject || 'Font Converter Feedback'
     )}&body=${encodeURIComponent(
       `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`
@@ -79,10 +87,10 @@ export const ContactUs: React.FC = () => {
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-slate-200">Email Support</div>
                   <a
-                    href="mailto:support@nepaliconverter.local"
+                    href={`mailto:${contact.email}`}
                     className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
-                    support@nepaliconverter.local
+                    {contact.email}
                   </a>
                 </div>
               </div>
@@ -91,7 +99,7 @@ export const ContactUs: React.FC = () => {
                 <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-slate-200">Location</div>
-                  <div className="text-xs">Kathmandu, Nepal</div>
+                  <div className="text-xs">{contact.location}</div>
                 </div>
               </div>
             </div>
@@ -100,7 +108,8 @@ export const ContactUs: React.FC = () => {
           <div className="p-5 rounded-2xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-xs text-teal-800 dark:text-teal-300 flex items-start gap-2.5">
             <Info className="w-4 h-4 shrink-0 mt-0.5 text-teal-600 dark:text-teal-400" />
             <div>
-              <span className="font-bold">Transparent Delivery Note:</span> This converter operates 100% in your browser without an active email server. Submitting the form simulates receipt or you can click "Open Email App" below.
+              <span className="font-bold">Notice: </span>
+              {contact.noticeText}
             </div>
           </div>
         </div>

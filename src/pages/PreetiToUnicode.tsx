@@ -20,7 +20,7 @@ export const PreetiToUnicode: React.FC = () => {
           title="Preeti to Unicode Converter"
           inputLabel="Preeti Text"
           outputLabel="Unicode Text"
-          inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
+          inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्।"
           convertFn={preetiToUnicode}
           downloadFilename="unicode-text.txt"
           isPreetiInput={true}

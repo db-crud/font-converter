@@ -142,10 +142,10 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
               rows={7}
               className={`w-full h-full min-h-[160px] sm:min-h-[180px] p-3 sm:p-3.5 text-base rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 transition-all leading-relaxed resize-y ${
                 isPreetiInput && renderPreetiInputFont
-                  ? 'font-preeti text-xl tracking-wide'
+                  ? 'font-preeti text-lg sm:text-xl tracking-wide'
                   : isPreetiInput
-                  ? 'font-mono text-base'
-                  : 'font-nepali text-lg'
+                  ? 'font-mono text-sm sm:text-base'
+                  : 'font-nepali text-base sm:text-[17px]'
               }`}
               aria-label={inputLabel}
             />
@@ -220,10 +220,10 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
               rows={7}
               className={`w-full h-full min-h-[160px] sm:min-h-[180px] p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed resize-y select-all ${
                 isPreetiOutput && renderPreetiFont
-                  ? 'font-preeti text-2xl tracking-wide text-slate-900 dark:text-slate-100'
+                  ? 'font-preeti text-lg sm:text-xl tracking-wide text-slate-900 dark:text-slate-100'
                   : isPreetiOutput
-                  ? 'font-mono text-base'
-                  : 'font-nepali text-lg'
+                  ? 'font-mono text-sm sm:text-base'
+                  : 'font-nepali text-base sm:text-[17px]'
               }`}
               aria-label={outputLabel}
             />
