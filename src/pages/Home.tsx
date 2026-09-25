@@ -9,32 +9,18 @@ import {
   Download,
   Smartphone,
   ArrowRight,
-  Keyboard
+  Keyboard,
+  ArrowLeftRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export const Home: React.FC = () => {
-  const [leftInput, setLeftInput] = useState('');
-  const [rightInput, setRightInput] = useState('');
+  // Mode: 'u2p' (Unicode to Preeti), 'p2u' (Preeti to Unicode), or 'both'
+  const [activeMode, setActiveMode] = useState<'u2p' | 'p2u' | 'both'>('u2p');
 
-  // Cross-card swap handlers
-  const handleSwapLeftToRight = (leftOutput: string) => {
-    // Left card's output is Preeti -> send to Right card's input (Preeti Input)
-    setRightInput(leftOutput);
+  const toggleDirection = () => {
+    setActiveMode((prev) => (prev === 'u2p' ? 'p2u' : 'u2p'));
   };
-
-  const handleSwapRightToLeft = (rightOutput: string) => {
-    // Right card's output is Unicode -> send to Left card's input (Unicode Input)
-    setLeftInput(rightOutput);
-  };
-
-  const samplePhrases = [
-    { label: 'नमस्ते', text: 'नमस्ते' },
-    { label: 'नेपाल सरकार', text: 'नेपाल सरकार' },
-    { label: 'कम्प्युटर विज्ञान', text: 'कम्प्युटर विज्ञान' },
-    { label: 'विद्यालयमा परीक्षा', text: 'विद्यालयमा आज परीक्षा हुँदैछ।' },
-    { label: 'मेरो नाम डान हो।', text: 'मेरो नाम डान हो।' },
-  ];
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -61,52 +47,110 @@ export const Home: React.FC = () => {
           <p className="mt-2 text-sm sm:text-base text-slate-500 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
             Fast, simple and accurate Nepali text conversion with automatic real-time conversion.
           </p>
-
-          {/* Quick Sample Chips */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2 text-xs">
-            <span className="text-slate-400 dark:text-slate-500 font-medium">Try quick sample:</span>
-            {samplePhrases.map((phrase) => (
-              <button
-                key={phrase.label}
-                onClick={() => setLeftInput(phrase.text)}
-                className="px-2.5 py-1 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500 hover:text-blue-600 dark:hover:text-blue-400 shadow-2xs transition-all active:scale-95"
-              >
-                {phrase.label}
-              </button>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* MAIN CONVERTER SECTION — TWO BOXES SIDE BY SIDE */}
+      {/* MAIN CONVERTER SECTION — LEFT (INPUT) & RIGHT (OUTPUT) */}
       <section className="py-8 sm:py-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full flex-1">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 xl:gap-8 items-start">
-          {/* LEFT CARD: Unicode to Preeti */}
+        {/* Converter Mode Tabs */}
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <button
+              onClick={() => setActiveMode('u2p')}
+              className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 ${
+                activeMode === 'u2p'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Unicode to Preeti
+            </button>
+            <button
+              onClick={() => setActiveMode('p2u')}
+              className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-150 ${
+                activeMode === 'p2u'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Preeti to Unicode
+            </button>
+            <button
+              onClick={() => setActiveMode('both')}
+              className={`px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-150 ${
+                activeMode === 'both'
+                  ? 'bg-blue-600 text-white shadow-sm'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+            >
+              Show Both
+            </button>
+          </div>
+
+          {activeMode !== 'both' && (
+            <button
+              onClick={toggleDirection}
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-white dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-750 shadow-2xs active:scale-95 transition-all"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <span>Switch Direction</span>
+            </button>
+          )}
+        </div>
+
+        {/* Display based on active mode */}
+        {activeMode === 'u2p' && (
           <ConverterCard
-            title="Unicode to Preeti"
-            inputLabel="Unicode Text"
-            outputLabel="Preeti Output"
-            inputPlaceholder="Type or paste Unicode text here..."
+            title="Unicode to Preeti Converter"
+            inputLabel="Unicode Text (Left: Paste / Type)"
+            outputLabel="Preeti Output (Right: Preeti Font)"
+            inputPlaceholder="Type or paste Nepali Unicode text here (e.g. नमस्ते, नेपाल, काठमाडौं)..."
             convertFn={unicodeToPreeti}
             downloadFilename="preeti-text.txt"
-            initialInput={leftInput}
-            onSwapWithOpposite={handleSwapLeftToRight}
-            accentColor="blue"
+            onSwapDirection={toggleDirection}
+            isPreetiInput={false}
+            isPreetiOutput={true}
           />
+        )}
 
-          {/* RIGHT CARD: Preeti to Unicode */}
+        {activeMode === 'p2u' && (
           <ConverterCard
-            title="Preeti to Unicode"
-            inputLabel="Preeti Text"
-            outputLabel="Unicode Output"
-            inputPlaceholder="Type or paste Preeti text here..."
+            title="Preeti to Unicode Converter"
+            inputLabel="Preeti Text (Left: Paste / Type)"
+            outputLabel="Unicode Output (Right: Devanagari)"
+            inputPlaceholder="Type or paste Preeti encoded text here (e.g. g]kfn, gd:t], ljBfno)..."
             convertFn={preetiToUnicode}
             downloadFilename="unicode-text.txt"
-            initialInput={rightInput}
-            onSwapWithOpposite={handleSwapRightToLeft}
-            accentColor="indigo"
+            onSwapDirection={toggleDirection}
+            isPreetiInput={true}
+            isPreetiOutput={false}
           />
-        </div>
+        )}
+
+        {activeMode === 'both' && (
+          <div className="space-y-8">
+            <ConverterCard
+              title="Unicode to Preeti"
+              inputLabel="Unicode Text (Left: Paste / Type)"
+              outputLabel="Preeti Output (Right: Preeti Font)"
+              inputPlaceholder="Type or paste Unicode text here..."
+              convertFn={unicodeToPreeti}
+              downloadFilename="preeti-text.txt"
+              isPreetiInput={false}
+              isPreetiOutput={true}
+            />
+            <ConverterCard
+              title="Preeti to Unicode"
+              inputLabel="Preeti Text (Left: Paste / Type)"
+              outputLabel="Unicode Output (Right: Devanagari)"
+              inputPlaceholder="Type or paste Preeti text here..."
+              convertFn={preetiToUnicode}
+              downloadFilename="unicode-text.txt"
+              isPreetiInput={true}
+              isPreetiOutput={false}
+            />
+          </div>
+        )}
       </section>
 
       {/* QUICK TOOLS CALLOUT */}
@@ -178,7 +222,7 @@ export const Home: React.FC = () => {
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">Easy</h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Simple interface with no unnecessary steps. Clean side-by-side cards provide immediate clarity.
+              Simple interface with no unnecessary steps. Left (Input) and Right (Output) layout provides immediate clarity.
             </p>
           </div>
 
@@ -243,11 +287,11 @@ export const Home: React.FC = () => {
               <ol className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-3">
                   <span className="font-semibold text-blue-600 dark:text-blue-400">1.</span>
-                  <span><strong>Enter or paste Unicode text:</strong> Type or paste your modern Devanagari text into the left card.</span>
+                  <span><strong>Enter or paste Unicode text:</strong> Type or paste your modern Devanagari text into the left box.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-semibold text-blue-600 dark:text-blue-400">2.</span>
-                  <span><strong>Automatic processing:</strong> The conversion engine instantly transforms matras, conjuncts, and characters into Preeti encoding.</span>
+                  <span><strong>Automatic processing:</strong> The conversion engine instantly transforms matras, conjuncts, and characters into Preeti encoding displayed in authentic Preeti font on the right.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-semibold text-blue-600 dark:text-blue-400">3.</span>
@@ -269,11 +313,11 @@ export const Home: React.FC = () => {
               <ol className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
                 <li className="flex items-start gap-3">
                   <span className="font-semibold text-indigo-600 dark:text-indigo-400">1.</span>
-                  <span><strong>Enter or paste Preeti text:</strong> Paste legacy Preeti text (e.g., <code>g]kfn</code>) into the right card.</span>
+                  <span><strong>Enter or paste Preeti text:</strong> Paste legacy Preeti text (e.g., <code>g]kfn</code>) into the left box.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-semibold text-indigo-600 dark:text-indigo-400">2.</span>
-                  <span><strong>Automatic processing:</strong> The converter parses glyphs, reverses reph and short-i matra ordering, producing clean Devanagari.</span>
+                  <span><strong>Automatic processing:</strong> The converter parses glyphs, reverses reph and short-i matra ordering, producing clean Devanagari on the right.</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <span className="font-semibold text-indigo-600 dark:text-indigo-400">3.</span>
@@ -308,10 +352,10 @@ export const Home: React.FC = () => {
 
           <div className="p-5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
             <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-2">
-              Why does Preeti text look like random English characters?
+              Why does Preeti text look like random English characters without the font?
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Because Preeti uses standard English ASCII letters (for example, typing <code>g]kfn</code> to produce नेपाल). If your computer does not have the Preeti font active, your browser displays the raw ASCII characters. Converting it to Unicode transforms it into actual Devanagari characters that anyone can read anywhere.
+              Because Preeti uses standard English ASCII letters (for example, typing <code>g]kfn</code> to produce नेपाल). In our converter, we automatically load and render the official Preeti font so you can see the Nepali glyphs directly on the screen!
             </p>
           </div>
 

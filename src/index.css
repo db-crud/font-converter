@@ -2,6 +2,14 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+@font-face {
+  font-family: 'Preeti';
+  src: url('/fonts/Preeti.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -35,4 +43,8 @@
 
 .font-heading {
   font-family: 'Outfit', 'Inter', sans-serif;
+}
+
+.font-preeti {
+  font-family: 'Preeti', -apple-system, BlinkMacSystemFont, serif;
 }

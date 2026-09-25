@@ -25,13 +25,13 @@ export const UnicodeToPreeti: React.FC = () => {
       <div className="mb-12">
         <ConverterCard
           title="Unicode to Preeti Converter"
-          inputLabel="Unicode Text"
-          outputLabel="Preeti Text"
+          inputLabel="Unicode Text (Left: Paste / Type)"
+          outputLabel="Preeti Output (Right: Preeti Font)"
           inputPlaceholder="Type or paste modern Nepali Unicode text here (e.g. नमस्ते, नेपाल सरकार, काठमाडौं)..."
           convertFn={unicodeToPreeti}
           downloadFilename="preeti-text.txt"
-          accentColor="blue"
-          isFullWidth={true}
+          isPreetiInput={false}
+          isPreetiOutput={true}
         />
       </div>
 
