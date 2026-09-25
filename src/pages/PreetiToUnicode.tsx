@@ -18,8 +18,8 @@ export const PreetiToUnicode: React.FC = () => {
       <div className="mb-12">
         <ConverterCard
           title="Preeti to Unicode Converter"
-          inputLabel="Preeti Text (Left: Paste / Type)"
-          outputLabel="Unicode Text (Right: Devanagari)"
+          inputLabel="Preeti Text"
+          outputLabel="Unicode Text"
           inputPlaceholder="प्रीतिको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
           convertFn={preetiToUnicode}
           downloadFilename="unicode-text.txt"
@@ -32,7 +32,7 @@ export const PreetiToUnicode: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-            <FileText className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <FileText className="w-4 h-4 text-teal-600 dark:text-teal-400" />
             What is Preeti?
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -77,7 +77,7 @@ export const PreetiToUnicode: React.FC = () => {
         </div>
         <Link
           to="/unicode-to-preeti"
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
         >
           <span>Unicode to Preeti</span>
           <ArrowRight className="w-3.5 h-3.5" />

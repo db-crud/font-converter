@@ -18,7 +18,7 @@ export const SwapButton: React.FC<SwapButtonProps> = ({
     <button
       onClick={onSwap}
       type="button"
-      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900 hover:bg-blue-100 dark:hover:bg-blue-900/60 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95 ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-95 ${className}`}
       title={title}
       aria-label={title}
     >

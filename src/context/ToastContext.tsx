@@ -65,13 +65,13 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                 ? 'bg-emerald-50/95 dark:bg-emerald-950/90 text-emerald-900 dark:text-emerald-100 border-emerald-200 dark:border-emerald-800 shadow-emerald-500/10'
                 : toast.type === 'error'
                 ? 'bg-rose-50/95 dark:bg-rose-950/90 text-rose-900 dark:text-rose-100 border-rose-200 dark:border-rose-800 shadow-rose-500/10'
-                : 'bg-blue-50/95 dark:bg-blue-950/90 text-blue-900 dark:text-blue-100 border-blue-200 dark:border-blue-800 shadow-blue-500/10'
+                : 'bg-teal-50/95 dark:bg-teal-950/90 text-teal-900 dark:text-teal-100 border-teal-200 dark:border-teal-800 shadow-teal-500/10'
             }`}
           >
             <div className="flex items-center gap-2.5 min-w-0">
               {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
               {toast.type === 'error' && <AlertCircle className="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" />}
-              {toast.type === 'info' && <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />}
+              {toast.type === 'info' && <Info className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0" />}
               <span className="text-sm font-medium leading-snug break-words">{toast.message}</span>
             </div>
             <button

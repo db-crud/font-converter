@@ -75,12 +75,12 @@ export const ContactUs: React.FC = () => {
             </h3>
             <div className="space-y-4 text-sm text-slate-600 dark:text-slate-400">
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+                <Mail className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-slate-200">Email Support</div>
                   <a
                     href="mailto:support@nepaliconverter.local"
-                    className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline"
                   >
                     support@nepaliconverter.local
                   </a>
@@ -88,7 +88,7 @@ export const ContactUs: React.FC = () => {
               </div>
 
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                <MapPin className="w-5 h-5 text-teal-600 dark:text-teal-400 shrink-0 mt-0.5" />
                 <div>
                   <div className="font-semibold text-slate-900 dark:text-slate-200">Location</div>
                   <div className="text-xs">Kathmandu, Nepal</div>
@@ -97,8 +97,8 @@ export const ContactUs: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-5 rounded-2xl bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800 text-xs text-blue-800 dark:text-blue-300 flex items-start gap-2.5">
-            <Info className="w-4 h-4 shrink-0 mt-0.5 text-blue-600 dark:text-blue-400" />
+          <div className="p-5 rounded-2xl bg-teal-50/70 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 text-xs text-teal-800 dark:text-teal-300 flex items-start gap-2.5">
+            <Info className="w-4 h-4 shrink-0 mt-0.5 text-teal-600 dark:text-teal-400" />
             <div>
               <span className="font-bold">Transparent Delivery Note:</span> This converter operates 100% in your browser without an active email server. Submitting the form simulates receipt or you can click "Open Email App" below.
             </div>
@@ -123,7 +123,7 @@ export const ContactUs: React.FC = () => {
                   <button
                     onClick={handleMailto}
                     type="button"
-                    className="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
+                    className="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
                   >
                     Open in Email App
                   </button>
@@ -155,7 +155,7 @@ export const ContactUs: React.FC = () => {
                     className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       errors.name
                         ? 'border-rose-400 focus:ring-rose-500'
-                        : 'border-slate-200 dark:border-slate-750 focus:ring-blue-500'
+                        : 'border-slate-200 dark:border-slate-750 focus:ring-emerald-500'
                     }`}
                   />
                   {errors.name && <p className="mt-1 text-xs text-rose-500">{errors.name}</p>}
@@ -175,7 +175,7 @@ export const ContactUs: React.FC = () => {
                     className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       errors.email
                         ? 'border-rose-400 focus:ring-rose-500'
-                        : 'border-slate-200 dark:border-slate-750 focus:ring-blue-500'
+                        : 'border-slate-200 dark:border-slate-750 focus:ring-emerald-500'
                     }`}
                   />
                   {errors.email && <p className="mt-1 text-xs text-rose-500">{errors.email}</p>}
@@ -195,7 +195,7 @@ export const ContactUs: React.FC = () => {
                     className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       errors.subject
                         ? 'border-rose-400 focus:ring-rose-500'
-                        : 'border-slate-200 dark:border-slate-750 focus:ring-blue-500'
+                        : 'border-slate-200 dark:border-slate-750 focus:ring-emerald-500'
                     }`}
                   />
                   {errors.subject && <p className="mt-1 text-xs text-rose-500">{errors.subject}</p>}
@@ -215,7 +215,7 @@ export const ContactUs: React.FC = () => {
                     className={`w-full px-3.5 py-2.5 text-sm rounded-xl border bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 transition-all ${
                       errors.message
                         ? 'border-rose-400 focus:ring-rose-500'
-                        : 'border-slate-200 dark:border-slate-750 focus:ring-blue-500'
+                        : 'border-slate-200 dark:border-slate-750 focus:ring-emerald-500'
                     }`}
                   />
                   {errors.message && <p className="mt-1 text-xs text-rose-500">{errors.message}</p>}
@@ -225,7 +225,7 @@ export const ContactUs: React.FC = () => {
                 <div className="pt-2 flex items-center justify-between">
                   <button
                     type="submit"
-                    className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 text-sm font-semibold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-95"
                   >
                     <Send className="w-4 h-4" />
                     <span>Send Message</span>
@@ -234,7 +234,7 @@ export const ContactUs: React.FC = () => {
                   <button
                     type="button"
                     onClick={handleMailto}
-                    className="text-xs text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 underline"
+                    className="text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 underline"
                   >
                     Or open in mail client
                   </button>

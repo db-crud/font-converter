@@ -10,7 +10,7 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5 inline-flex">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-sm">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center text-white shadow-sm">
                 <span className="font-nepali text-lg font-bold">ने</span>
               </div>
               <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-heading">
@@ -37,22 +37,22 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/preeti-to-unicode" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/preeti-to-unicode" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Preeti to Unicode
                 </Link>
               </li>
               <li>
-                <Link to="/unicode-to-preeti" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/unicode-to-preeti" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Unicode to Preeti
                 </Link>
               </li>
               <li>
-                <Link to="/type-in-nepali" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/type-in-nepali" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Type in Nepali
                 </Link>
               </li>
@@ -66,12 +66,12 @@ export const Footer: React.FC = () => {
             </h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/about-us" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/about-us" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link to="/contact-us" className="text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                <Link to="/contact-us" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -81,9 +81,9 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar */}
         <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© 2026 Font Converter. All rights reserved.</p>
+          <p>© 2026 Font Converter. Built by Motherland IT Tech Pvt. Ltd. All rights reserved.</p>
           <p className="flex items-center gap-1">
-            Built for modern Nepali computing <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />
+            Proudly built in Nepal 🇳🇵 with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />
           </p>
         </div>
       </div>

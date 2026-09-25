@@ -78,10 +78,10 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
   return (
     <div className="flex flex-col bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/90 dark:border-slate-800 shadow-md shadow-slate-200/50 dark:shadow-slate-950/50 overflow-hidden transition-all duration-200">
       {/* Card Header Bar */}
-      <div className="flex items-center justify-between px-6 py-4 bg-slate-50/90 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full bg-blue-600 ring-4 ring-blue-500/20" />
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white font-heading tracking-tight">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50/90 dark:bg-slate-850 border-b border-slate-200 dark:border-slate-800">
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full bg-emerald-600 ring-4 ring-emerald-500/20" />
+          <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white font-heading tracking-tight">
             {title}
           </h2>
         </div>
@@ -96,40 +96,37 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
       </div>
 
       {/* HORIZONTAL CONVERTER: LEFT (INPUT) & RIGHT (OUTPUT) */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:divide-slate-800">
+      <div className="grid grid-cols-1 lg:grid-cols-2 divide-y lg:divide-y-0 lg:divide-x divide-slate-200 dark:border-slate-800">
         {/* ================= LEFT BOX: INPUT ================= */}
-        <div className="p-6 flex flex-col gap-3">
+        <div className="p-4 sm:p-6 flex flex-col gap-3">
           {/* Input Header & Controls */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <label
                 htmlFor={inputId}
-                className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5"
+                className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200"
               >
-                <span>{inputLabel}</span>
-                <span className="text-[10px] font-medium lowercase px-1.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-900">
-                  Left: Input
-                </span>
+                {inputLabel}
               </label>
 
               {isPreetiInput && (
                 <button
                   type="button"
                   onClick={() => setRenderPreetiInputFont(!renderPreetiInputFont)}
-                  className={`inline-flex items-center gap-1 px-2 py-0.5 text-[11px] font-semibold rounded-md border transition-all ${
+                  className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all active:scale-95 ${
                     renderPreetiInputFont
-                      ? 'bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                   }`}
                   title="Toggle Preeti font rendering for input"
                 >
-                  {renderPreetiInputFont ? <Eye className="w-3 h-3" /> : <Code2 className="w-3 h-3" />}
+                  {renderPreetiInputFont ? <Eye className="w-3.5 h-3.5" /> : <Code2 className="w-3.5 h-3.5" />}
                   <span>{renderPreetiInputFont ? 'Preeti Font' : 'English / Raw'}</span>
                 </button>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <PasteButton onPasteText={handlePaste} label="Paste" />
               <ClearButton onClear={handleClear} disabled={!inputText} label="Clear" />
             </div>
@@ -143,7 +140,7 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
               onChange={handleInputChange}
               placeholder={inputPlaceholder}
               rows={7}
-              className={`w-full h-full min-h-[170px] p-3.5 text-base rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-slate-950 transition-all leading-relaxed resize-y ${
+              className={`w-full h-full min-h-[160px] sm:min-h-[180px] p-3 sm:p-3.5 text-base rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/50 dark:bg-slate-950/60 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white dark:focus:bg-slate-950 transition-all leading-relaxed resize-y ${
                 isPreetiInput && renderPreetiInputFont
                   ? 'font-preeti text-xl tracking-wide'
                   : isPreetiInput
@@ -156,34 +153,31 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
 
           {/* Left Footer: Dynamic Stats */}
           <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-1">
-            <div className="flex items-center gap-3 font-mono">
+            <div className="flex items-center gap-2 sm:gap-3 font-mono">
               <span className="font-semibold text-slate-700 dark:text-slate-300">
-                Characters: {inputCharCount}
+                Chars: {inputCharCount}
               </span>
               <span>•</span>
               <span className="font-semibold text-slate-700 dark:text-slate-300">
                 Words: {inputWordCount}
               </span>
             </div>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500">
+            <span className="text-[11px] text-slate-400 dark:text-slate-500 hidden sm:inline">
               Paste or type here
             </span>
           </div>
         </div>
 
         {/* ================= RIGHT BOX: OUTPUT ================= */}
-        <div className="p-6 flex flex-col gap-3 bg-slate-50/30 dark:bg-slate-950/20">
+        <div className="p-4 sm:p-6 flex flex-col gap-3 bg-slate-50/30 dark:bg-slate-950/20">
           {/* Output Header & Preeti Font Toggle */}
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <label
                 htmlFor={outputId}
-                className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-1.5"
+                className="text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200"
               >
-                <span>{outputLabel}</span>
-                <span className="text-[10px] font-medium lowercase px-1.5 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-900">
-                  Right: Output
-                </span>
+                {outputLabel}
               </label>
 
               {/* Preeti Font Toggle Button */}
@@ -193,7 +187,7 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
                   onClick={() => setRenderPreetiFont(!renderPreetiFont)}
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-bold rounded-lg border transition-all active:scale-95 shadow-2xs ${
                     renderPreetiFont
-                      ? 'bg-blue-600 text-white border-blue-600 shadow-blue-500/20'
+                      ? 'bg-emerald-600 text-white border-emerald-600 shadow-emerald-500/20'
                       : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-100'
                   }`}
                   title="Toggle between Preeti font display and raw ASCII English characters"
@@ -205,9 +199,9 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
             </div>
 
             {/* Output Stats */}
-            <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
+            <div className="flex items-center gap-2 sm:gap-3 text-xs text-slate-500 dark:text-slate-400 font-mono">
               <span className="font-semibold text-slate-700 dark:text-slate-300">
-                Characters: {outputCharCount}
+                Chars: {outputCharCount}
               </span>
               <span>•</span>
               <span className="font-semibold text-slate-700 dark:text-slate-300">
@@ -224,7 +218,7 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
               readOnly
               placeholder="Converted output will appear here in real time..."
               rows={7}
-              className={`w-full h-full min-h-[170px] p-3.5 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed resize-y select-all ${
+              className={`w-full h-full min-h-[160px] sm:min-h-[180px] p-3 sm:p-3.5 rounded-xl border border-slate-200 dark:border-slate-750 bg-white dark:bg-slate-950/80 text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all leading-relaxed resize-y select-all ${
                 isPreetiOutput && renderPreetiFont
                   ? 'font-preeti text-2xl tracking-wide text-slate-900 dark:text-slate-100'
                   : isPreetiOutput
@@ -237,10 +231,10 @@ export const ConverterCard: React.FC<ConverterCardProps> = ({
 
           {/* Right Footer: Actions (Copy, Download, Clear) */}
           <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <CopyButton
                 text={outputText}
-                className="bg-blue-600 hover:bg-blue-700 text-white border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500 dark:border-blue-600 shadow-sm px-4 py-2 font-bold"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:border-emerald-600 shadow-sm px-3.5 sm:px-4 py-2 font-bold"
                 label="Copy"
               />
               <DownloadButton

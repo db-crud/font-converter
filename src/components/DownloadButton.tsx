@@ -43,7 +43,7 @@ export const DownloadButton: React.FC<DownloadButtonProps> = ({
     <button
       onClick={handleDownload}
       type="button"
-      className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 active:scale-95 transition-all ${className}`}
+      className={`inline-flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/80 shadow-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 active:scale-95 transition-all ${className}`}
       title={`Download as ${filename}`}
       aria-label={`Download as ${filename}`}
     >

@@ -59,26 +59,26 @@ export const AboutUs: React.FC = () => {
       </div>
 
       {/* Core Mission Card */}
-      <div className="p-8 rounded-3xl bg-gradient-to-br from-blue-600 to-indigo-700 text-white shadow-lg mb-12 relative overflow-hidden">
+      <div className="p-8 rounded-3xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-700 text-white shadow-lg mb-12 relative overflow-hidden">
         <div className="relative z-10 max-w-3xl">
           <h2 className="text-2xl sm:text-3xl font-bold font-heading mb-4">
             Preserving & Modernizing Nepali Typography
           </h2>
-          <p className="text-blue-100 text-base leading-relaxed mb-6">
-            Nepal’s digital heritage contains millions of documents written in legacy font encodings like Preeti, Kantipur, and Sagarmatha. Our mission is to bridge the gap between historic typography and modern digital systems with zero friction and absolute privacy.
+          <p className="text-emerald-50 text-base leading-relaxed mb-6">
+            Nepal’s digital heritage contains millions of documents written in legacy font encodings like Preeti, Kantipur, and Sagarmatha. Developed by Motherland IT Tech Pvt. Ltd., our mission is to bridge the gap between historic typography and modern digital systems with zero friction and absolute privacy.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-blue-400/30 text-xs sm:text-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-emerald-400/30 text-xs sm:text-sm">
             <div>
               <div className="font-extrabold text-xl sm:text-2xl text-white">100%</div>
-              <div className="text-blue-200">Client-Side Logic</div>
+              <div className="text-emerald-100">Client-Side Logic</div>
             </div>
             <div>
               <div className="font-extrabold text-xl sm:text-2xl text-white">0 ms</div>
-              <div className="text-blue-200">Server Latency</div>
+              <div className="text-emerald-100">Server Latency</div>
             </div>
             <div>
               <div className="font-extrabold text-xl sm:text-2xl text-white">Free</div>
-              <div className="text-blue-200">Forever For Everyone</div>
+              <div className="text-emerald-100">Forever For Everyone</div>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@ export const AboutUs: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
         {/* Unicode Section */}
         <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-950/80 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-5">
+          <div className="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-5">
             <Globe className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
@@ -115,7 +115,7 @@ export const AboutUs: React.FC = () => {
 
         {/* Preeti Section */}
         <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <div className="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mb-5">
+          <div className="w-12 h-12 rounded-xl bg-teal-100 dark:bg-teal-950/80 text-teal-600 dark:text-teal-400 flex items-center justify-center mb-5">
             <Layers className="w-6 h-6" />
           </div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
@@ -126,15 +126,15 @@ export const AboutUs: React.FC = () => {
           </p>
           <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
             <li className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-indigo-500 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-teal-500 shrink-0" />
               <span>Extensively used in printing presses and government files</span>
             </li>
             <li className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-indigo-500 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-teal-500 shrink-0" />
               <span>Standard keyboard muscle memory for millions of typists</span>
             </li>
             <li className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-indigo-500 shrink-0" />
+              <CheckCircle className="w-4 h-4 text-teal-500 shrink-0" />
               <span>Requires custom font files installed to view correctly</span>
             </li>
           </ul>
@@ -160,7 +160,7 @@ export const AboutUs: React.FC = () => {
                 key={uc.title}
                 className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm"
               >
-                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-blue-600 dark:text-blue-400 flex items-center justify-center mb-3">
+                <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-3">
                   <Icon className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-white mb-1.5">

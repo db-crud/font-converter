@@ -18,8 +18,8 @@ export const UnicodeToPreeti: React.FC = () => {
       <div className="mb-12">
         <ConverterCard
           title="Unicode to Preeti Converter"
-          inputLabel="Unicode Text (Left: Paste / Type)"
-          outputLabel="Preeti Output (Right: Preeti Font)"
+          inputLabel="Unicode Text"
+          outputLabel="Preeti Text"
           inputPlaceholder="युनिकोडको टेक्स्ट यहाँ लेख्नुहोस् अथवा पेस्ट गर्नुहोस्..."
           convertFn={unicodeToPreeti}
           downloadFilename="preeti-text.txt"
@@ -32,7 +32,7 @@ export const UnicodeToPreeti: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-            <Printer className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+            <Printer className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             Why Convert to Preeti?
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -42,11 +42,11 @@ export const UnicodeToPreeti: React.FC = () => {
 
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
+            <Layers className="w-4 h-4 text-teal-600 dark:text-teal-400" />
             How to Use Output in Word
           </h3>
           <ol className="text-sm text-slate-600 dark:text-slate-400 space-y-1.5 list-decimal list-inside">
-            <li>Click <strong>Copy</strong> on the Preeti Output box.</li>
+            <li>Click <strong>Copy</strong> on the Preeti Text box.</li>
             <li>Open Microsoft Word or Adobe software.</li>
             <li>Paste the text into your document.</li>
             <li>Select the pasted text and change the font to <strong>Preeti</strong>.</li>
@@ -55,7 +55,7 @@ export const UnicodeToPreeti: React.FC = () => {
 
         <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
           <h3 className="text-base font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-            <HelpCircle className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+            <HelpCircle className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
             Accurate Reordering
           </h3>
           <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
@@ -76,7 +76,7 @@ export const UnicodeToPreeti: React.FC = () => {
         </div>
         <Link
           to="/preeti-to-unicode"
-          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors"
         >
           <span>Preeti to Unicode</span>
           <ArrowRight className="w-3.5 h-3.5" />
