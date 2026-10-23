@@ -14,6 +14,7 @@ import {
   ArrowLeftRight
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { SiteLogo } from '../components/SiteLogo';
 
 export const Home: React.FC = () => {
   const { hero } = useSiteSettings();
@@ -28,7 +29,12 @@ export const Home: React.FC = () => {
     <div className="flex flex-col min-h-screen">
       {/* HERO SECTION */}
       <section className="relative overflow-hidden pt-8 pb-6 sm:pt-12 sm:pb-8 bg-gradient-to-b from-emerald-50/60 via-teal-50/20 to-slate-50 dark:from-emerald-950/20 dark:via-slate-950 dark:to-slate-950 border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
+          {hero.logoUrl && (
+            <div className="mb-4">
+              <SiteLogo className="w-16 h-16 shadow-lg" />
+            </div>
+          )}
           {/* Main Heading */}
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight leading-tight">
             {hero.title}

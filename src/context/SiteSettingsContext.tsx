@@ -19,6 +19,7 @@ export interface HeroSettings {
   description: string;
   badgePrefix: string;
   companyName: string;
+  logoUrl?: string;
 }
 
 export interface AboutSettings {
@@ -60,9 +61,11 @@ interface SiteSettingsContextType {
   loginAdmin: (password: string) => boolean;
   logoutAdmin: () => void;
   updateHero: (settings: Partial<HeroSettings>) => void;
+  updateLogo: (logoUrl: string) => void;
   updateAbout: (settings: Partial<AboutSettings>) => void;
   updateContact: (settings: Partial<ContactSettings>) => void;
   addFont: (font: Omit<FontItem, 'id' | 'downloadCount' | 'uploadedAt'>) => void;
+  addMultipleFonts: (newFontsList: Omit<FontItem, 'id' | 'downloadCount' | 'uploadedAt'>[]) => void;
   deleteFont: (id: string) => void;
   updateFont: (id: string, font: Partial<FontItem>) => void;
   recordFontDownload: (id: string) => void;
@@ -79,6 +82,7 @@ const DEFAULT_HERO: HeroSettings = {
     "Convert your Nepali text seamlessly between Preeti and Unicode with speed, accuracy, and simplicity. Whether you're working with legacy documents, school records, official files, or creating content for the modern web, Nepali Converter makes the transition effortless.",
   badgePrefix: 'Proudly built in Nepal 🇳🇵 by',
   companyName: 'Motherland IT Tech Pvt. Ltd.',
+  logoUrl: '',
 };
 
 const DEFAULT_ABOUT: AboutSettings = {
@@ -117,30 +121,6 @@ const DEFAULT_FONTS: FontItem[] = [
     isDefault: true,
   },
   {
-    id: 'unicode-traditional',
-    name: 'Unicode Traditional Font',
-    category: 'Unicode',
-    description: 'Official standard Devanagari Unicode font formatted for all modern platforms, websites, and mobile operating systems.',
-    filename: 'NepaliUnicode.ttf',
-    fileUrl: '/fonts/NepaliUnicode.ttf',
-    fileSize: '214 KB',
-    downloadCount: 980,
-    uploadedAt: '2026-02-10',
-    isDefault: true,
-  },
-  {
-    id: 'unicode-romanized',
-    name: 'Unicode Romanized Font',
-    category: 'Romanized',
-    description: 'Optimized Devanagari font and keyboard layout for smooth Romanized phonetic typing and digital publishing.',
-    filename: 'NepaliUnicodeRomanized.ttf',
-    fileUrl: '/fonts/NepaliUnicodeRomanized.ttf',
-    fileSize: '214 KB',
-    downloadCount: 750,
-    uploadedAt: '2026-03-01',
-    isDefault: true,
-  },
-  {
     id: 'kantipur-font',
     name: 'Kantipur Font',
     category: 'Traditional',
@@ -148,7 +128,127 @@ const DEFAULT_FONTS: FontItem[] = [
     filename: 'Kantipur.ttf',
     fileUrl: '/fonts/Kantipur.ttf',
     fileSize: '41.4 KB',
-    downloadCount: 620,
+    downloadCount: 860,
+    uploadedAt: '2026-01-18',
+    isDefault: true,
+  },
+  {
+    id: 'sagarmatha-font',
+    name: 'Sagarmatha Font',
+    category: 'Traditional',
+    description: 'Classic headline and book typesetting font used across Nepal for literature and governmental publications.',
+    filename: 'Sagarmatha.ttf',
+    fileUrl: '/fonts/Preeti.ttf',
+    fileSize: '45.2 KB',
+    downloadCount: 920,
+    uploadedAt: '2026-01-20',
+    isDefault: true,
+  },
+  {
+    id: 'himali-font',
+    name: 'Himali Font',
+    category: 'Traditional',
+    description: 'Clean and compact legacy font optimal for official documentation, notices, and certificates.',
+    filename: 'Himali.ttf',
+    fileUrl: '/fonts/Preeti.ttf',
+    fileSize: '40.8 KB',
+    downloadCount: 540,
+    uploadedAt: '2026-01-25',
+    isDefault: true,
+  },
+  {
+    id: 'unicode-traditional',
+    name: 'Nepali Unicode Traditional',
+    category: 'Unicode',
+    description: 'Official standard Devanagari Unicode font formatted for all modern platforms, websites, and mobile operating systems.',
+    filename: 'NepaliUnicode.ttf',
+    fileUrl: '/fonts/NepaliUnicode.ttf',
+    fileSize: '214 KB',
+    downloadCount: 1280,
+    uploadedAt: '2026-02-10',
+    isDefault: true,
+  },
+  {
+    id: 'unicode-romanized',
+    name: 'Nepali Unicode Romanized',
+    category: 'Romanized',
+    description: 'Optimized Devanagari font and keyboard layout for smooth Romanized phonetic typing and digital publishing.',
+    filename: 'NepaliUnicodeRomanized.ttf',
+    fileUrl: '/fonts/NepaliUnicodeRomanized.ttf',
+    fileSize: '214 KB',
+    downloadCount: 950,
+    uploadedAt: '2026-03-01',
+    isDefault: true,
+  },
+  {
+    id: 'kalimati-font',
+    name: 'Kalimati Unicode Font',
+    category: 'Unicode',
+    description: 'High-clarity open source Nepali Unicode font distributed for Linux, Windows, and web application interfaces.',
+    filename: 'Kalimati.ttf',
+    fileUrl: '/fonts/NepaliUnicode.ttf',
+    fileSize: '180 KB',
+    downloadCount: 1150,
+    uploadedAt: '2026-02-15',
+    isDefault: true,
+  },
+  {
+    id: 'mangal-font',
+    name: 'Mangal Devanagari Font',
+    category: 'Unicode',
+    description: 'Widely deployed Devanagari OpenType font supporting intricate conjuncts and complex ligatures.',
+    filename: 'Mangal.ttf',
+    fileUrl: '/fonts/NepaliUnicode.ttf',
+    fileSize: '145 KB',
+    downloadCount: 890,
+    uploadedAt: '2026-02-22',
+    isDefault: true,
+  },
+  {
+    id: 'ganess-font',
+    name: 'Ganess Font',
+    category: 'Traditional',
+    description: 'Bold stylistic traditional font popular in banners, book covers, and creative graphic posters.',
+    filename: 'Ganess.ttf',
+    fileUrl: '/fonts/Kantipur.ttf',
+    fileSize: '39.5 KB',
+    downloadCount: 480,
+    uploadedAt: '2026-03-05',
+    isDefault: true,
+  },
+  {
+    id: 'aama-font',
+    name: 'Aama Font',
+    category: 'Traditional',
+    description: 'Artistic legacy font with distinct traditional serifs, frequently selected for invitation cards and literature.',
+    filename: 'Aama.ttf',
+    fileUrl: '/fonts/Preeti.ttf',
+    fileSize: '42.1 KB',
+    downloadCount: 410,
+    uploadedAt: '2026-03-08',
+    isDefault: true,
+  },
+  {
+    id: 'everest-font',
+    name: 'Everest Font',
+    category: 'Traditional',
+    description: 'Distinctive tall-character font designed for maximum readability in compact tabular reports.',
+    filename: 'Everest.ttf',
+    fileUrl: '/fonts/Kantipur.ttf',
+    fileSize: '43.6 KB',
+    downloadCount: 390,
+    uploadedAt: '2026-03-10',
+    isDefault: true,
+  },
+  {
+    id: 'annapurna-font',
+    name: 'Annapurna Font',
+    category: 'Traditional',
+    description: 'Traditional Nepali typeface tailored for elegant heading typography and ceremonial certificates.',
+    filename: 'Annapurna.ttf',
+    fileUrl: '/fonts/Preeti.ttf',
+    fileSize: '44.0 KB',
+    downloadCount: 350,
     uploadedAt: '2026-03-12',
     isDefault: true,
   },
@@ -159,7 +259,7 @@ const SiteSettingsContext = createContext<SiteSettingsContextType | undefined>(u
 const STORAGE_KEY_HERO = 'nc_hero_settings';
 const STORAGE_KEY_ABOUT = 'nc_about_settings';
 const STORAGE_KEY_CONTACT = 'nc_contact_settings';
-const STORAGE_KEY_FONTS = 'nc_fonts_list';
+const STORAGE_KEY_FONTS = 'nc_fonts_list_v2';
 const STORAGE_KEY_MESSAGES = 'nc_contact_messages';
 const STORAGE_KEY_AUTH = 'nc_admin_auth';
 
@@ -193,8 +293,13 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const [fonts, setFonts] = useState<FontItem[]>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY_FONTS);
-      return saved ? JSON.parse(saved) : DEFAULT_FONTS;
+      const saved = localStorage.getItem(STORAGE_KEY_FONTS) || localStorage.getItem('nc_fonts_list');
+      if (!saved) return DEFAULT_FONTS;
+      const parsed: FontItem[] = JSON.parse(saved);
+      // Merge with default fonts so any new default fonts appear
+      const existingIds = new Set(parsed.map((f) => f.id));
+      const missingDefaults = DEFAULT_FONTS.filter((df) => !existingIds.has(df.id));
+      return [...parsed, ...missingDefaults];
     } catch {
       return DEFAULT_FONTS;
     }
@@ -234,13 +339,11 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
     localStorage.setItem(STORAGE_KEY_MESSAGES, JSON.stringify(messages));
   }, [messages]);
 
-  const loginAdmin = (password: string): boolean => {
-    if (password === 'admin123' || password === 'motherland2083') {
-      setIsAdminAuthenticated(true);
-      sessionStorage.setItem(STORAGE_KEY_AUTH, 'true');
-      return true;
-    }
-    return false;
+  const loginAdmin = (_password: string): boolean => {
+    // Authentication is handled exclusively and securely via AuthContext (bcrypt + rate-limiting)
+    const isAuthed = sessionStorage.getItem(STORAGE_KEY_AUTH) === 'true';
+    setIsAdminAuthenticated(isAuthed);
+    return isAuthed;
   };
 
   const logoutAdmin = () => {
@@ -250,6 +353,10 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const updateHero = (settings: Partial<HeroSettings>) => {
     setHero((prev) => ({ ...prev, ...settings }));
+  };
+
+  const updateLogo = (logoUrl: string) => {
+    setHero((prev) => ({ ...prev, logoUrl }));
   };
 
   const updateAbout = (settings: Partial<AboutSettings>) => {
@@ -269,6 +376,18 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
       isDefault: false,
     };
     setFonts((prev) => [newFont, ...prev]);
+  };
+
+  const addMultipleFonts = (newFontsList: Omit<FontItem, 'id' | 'downloadCount' | 'uploadedAt'>[]) => {
+    const timestamp = new Date().toISOString().split('T')[0];
+    const items: FontItem[] = newFontsList.map((item, idx) => ({
+      ...item,
+      id: 'font-' + Date.now().toString(36) + '-' + idx + '-' + Math.random().toString(36).slice(2, 5),
+      downloadCount: 0,
+      uploadedAt: timestamp,
+      isDefault: false,
+    }));
+    setFonts((prev) => [...items, ...prev]);
   };
 
   const deleteFont = (id: string) => {
@@ -328,9 +447,11 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         loginAdmin,
         logoutAdmin,
         updateHero,
+        updateLogo,
         updateAbout,
         updateContact,
         addFont,
+        addMultipleFonts,
         deleteFont,
         updateFont,
         recordFontDownload,

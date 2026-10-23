@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 export const PreetiToUnicode: React.FC = () => {
   return (
-    <div className="flex flex-col min-h-screen py-8 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col min-h-screen py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">

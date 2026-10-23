@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Zap, Heart } from 'lucide-react';
+import { ShieldCheck, Zap } from 'lucide-react';
+import { SiteLogo } from './SiteLogo';
 
 export const Footer: React.FC = () => {
   return (
@@ -10,9 +11,7 @@ export const Footer: React.FC = () => {
           {/* Brand Info */}
           <div className="md:col-span-2 space-y-4">
             <Link to="/" className="flex items-center gap-2.5 inline-flex">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center text-white shadow-sm">
-                <span className="font-nepali text-lg font-bold">ने</span>
-              </div>
+              <SiteLogo className="w-9 h-9" />
               <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white font-heading">
                 Font Converter
               </span>
@@ -57,6 +56,16 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/hamro-patro" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                  Hamro Patro
+                </Link>
+              </li>
+              <li>
+                <Link to="/date-converter" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                  Date Converter
+                </Link>
+              </li>
+              <li>
                 <Link to="/type-in-nepali" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
                   Type in Nepali
                 </Link>
@@ -80,21 +89,13 @@ export const Footer: React.FC = () => {
                   Contact Us
                 </Link>
               </li>
-              <li>
-                <Link to="/admin" className="text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-                  Admin Dashboard
-                </Link>
-              </li>
             </ul>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© 2026 Font Converter. Built by Motherland IT Tech Pvt. Ltd. All rights reserved.</p>
-          <p className="flex items-center gap-1">
-            Proudly built in Nepal 🇳🇵 with <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 inline" />
-          </p>
+        <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-800 flex items-center justify-center text-xs text-slate-500 dark:text-slate-400 text-center">
+          <p>© 2026. All rights reserved.</p>
         </div>
       </div>
     </footer>

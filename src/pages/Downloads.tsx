@@ -1,27 +1,45 @@
 import React, { useState } from 'react';
 import { useSiteSettings, type FontItem } from '../context/SiteSettingsContext';
 import { useToast } from '../context/ToastContext';
-import { Download, CheckCircle, FileText, Sparkles, Monitor, Info, ArrowRight } from 'lucide-react';
+import {
+  Download,
+  CheckCircle,
+  FileText,
+  Sparkles,
+  Monitor,
+  Info,
+  ArrowRight,
+  Search,
+  Archive,
+  Loader2,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import JSZip from 'jszip';
 
 export const Downloads: React.FC = () => {
   const { fonts, recordFontDownload } = useSiteSettings();
   const { showToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadingZip, setDownloadingZip] = useState<boolean>(false);
 
   const categories = ['All', 'Traditional', 'Unicode', 'Romanized'];
 
-  const filteredFonts = selectedCategory === 'All'
-    ? fonts
-    : fonts.filter((f) => f.category === selectedCategory);
+  const filteredFonts = fonts.filter((f) => {
+    const matchesCategory = selectedCategory === 'All' || f.category === selectedCategory;
+    const matchesSearch =
+      f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      f.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   const handleDownload = (font: FontItem) => {
     setDownloadingId(font.id);
     recordFontDownload(font.id);
     showToast(`Downloading ${font.name}...`, 'success');
 
-    // Create an invisible anchor tag to trigger real browser file download
     const link = document.createElement('a');
     link.href = font.fileUrl;
     link.download = font.filename || `${font.name.replace(/\s+/g, '_')}.ttf`;
@@ -34,37 +52,142 @@ export const Downloads: React.FC = () => {
     }, 1500);
   };
 
+  const handleDownloadAllZip = async () => {
+    if (filteredFonts.length === 0) {
+      showToast('No fonts available to download.', 'error');
+      return;
+    }
+
+    setDownloadingZip(true);
+    showToast(`Creating ZIP with ${filteredFonts.length} font(s)...`, 'info');
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder('Nepali_Fonts') || zip;
+
+      for (const font of filteredFonts) {
+        recordFontDownload(font.id);
+
+        if (font.fileUrl.startsWith('data:')) {
+          // Base64 data URL
+          const parts = font.fileUrl.split(',');
+          if (parts[1]) {
+            folder.file(font.filename, parts[1], { base64: true });
+          }
+        } else {
+          // URL path (e.g. /fonts/Preeti.ttf)
+          try {
+            const resp = await fetch(font.fileUrl);
+            if (resp.ok) {
+              const blob = await resp.blob();
+              folder.file(font.filename, blob);
+            }
+          } catch (e) {
+            console.warn(`Could not bundle ${font.name}:`, e);
+          }
+        }
+      }
+
+      // Add a helpful readme inside the zip
+      folder.file(
+        'README.txt',
+        `Nepali Fonts Pack\nDownloaded from Nepali Font Converter (Preeti <-> Unicode)\nTotal Fonts: ${filteredFonts.length}\nDate: ${new Date().toLocaleDateString()}\n\nInstallation:\n- Windows: Right click each .ttf file and choose Install.\n- Mac: Double click the .ttf file and click Install Font.`
+      );
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const downloadUrl = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `Nepali_Fonts_Pack_${selectedCategory === 'All' ? 'All' : selectedCategory}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+
+      showToast(`ZIP package downloaded successfully! (${filteredFonts.length} fonts)`, 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Error generating ZIP file.', 'error');
+    } finally {
+      setDownloadingZip(false);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen py-8 sm:py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto mb-10">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/70 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-300 mb-3 shadow-2xs">
           <Sparkles className="w-3.5 h-3.5" />
-          <span>Official Font Repository</span>
+          <span>Official Font Repository • {fonts.length} Fonts</span>
         </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white font-heading tracking-tight">
           Download Nepali Fonts
         </h1>
         <p className="mt-3 text-sm sm:text-base text-slate-600 dark:text-slate-400 leading-relaxed">
-          Download official, authentic Nepali fonts including Preeti, Kantipur, and Unicode standards for Windows, Mac, and mobile devices. 100% free and ready to install.
+          Download official, authentic Nepali fonts including Preeti, Kantipur, Sagarmatha, Himali, and Unicode standards for Windows, Mac, and mobile devices. 100% free and ready to install.
         </p>
+
+        {/* Action: Download All as ZIP */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+          <button
+            onClick={handleDownloadAllZip}
+            disabled={downloadingZip || filteredFonts.length === 0}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-md shadow-emerald-600/20 active:scale-95 transition-all disabled:opacity-50"
+          >
+            {downloadingZip ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
+                <span>Creating ZIP Package...</span>
+              </>
+            ) : (
+              <>
+                <Archive className="w-4 h-4" />
+                <span>Download All as ZIP ({filteredFonts.length} Fonts)</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* Category Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 active:scale-95 ${
-              selectedCategory === cat
-                ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
-                : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
-            }`}
-          >
-            {cat === 'All' ? 'All Fonts' : `${cat} Fonts`}
-          </button>
-        ))}
+      {/* Search and Filters Bar */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
+        {/* Category Tabs */}
+        <div className="flex flex-wrap items-center gap-2">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setSelectedCategory(cat)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-150 active:scale-95 ${
+                selectedCategory === cat
+                  ? 'bg-emerald-600 text-white shadow-sm shadow-emerald-600/20'
+                  : 'bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800'
+              }`}
+            >
+              {cat === 'All' ? `All Fonts (${fonts.length})` : `${cat} Fonts`}
+            </button>
+          ))}
+        </div>
+
+        {/* Search Input */}
+        <div className="relative w-full md:w-72">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search fonts by name..."
+            className="w-full pl-10 pr-4 py-2 text-xs sm:text-sm rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+            >
+              Clear
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Fonts Grid */}
@@ -144,10 +267,19 @@ export const Downloads: React.FC = () => {
       </div>
 
       {filteredFonts.length === 0 && (
-        <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
-            No fonts found in the selected category.
+        <div className="text-center py-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 mb-12">
+          <p className="text-slate-500 dark:text-slate-400 text-sm mb-2">
+            No fonts found matching your search.
           </p>
+          <button
+            onClick={() => {
+              setSelectedCategory('All');
+              setSearchQuery('');
+            }}
+            className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
+          >
+            Reset Filters
+          </button>
         </div>
       )}
 
@@ -164,8 +296,9 @@ export const Downloads: React.FC = () => {
               Windows 11 / 10 / 8 / 7:
             </h3>
             <ol className="space-y-1.5 list-decimal list-inside text-xs sm:text-sm">
-              <li>Click the <strong>Download</strong> button above to download the <code>.ttf</code> file.</li>
-              <li>Right-click on the downloaded font file.</li>
+              <li>Click the <strong>Download</strong> button above to download the font or ZIP file.</li>
+              <li>If downloaded as ZIP, right-click and choose <em>Extract All</em>.</li>
+              <li>Right-click on the <code>.ttf</code> or <code>.otf</code> font file.</li>
               <li>Select <strong>Install</strong> (or <em>Install for all users</em>).</li>
               <li>Restart Microsoft Word, Photoshop, or your browser to start typing!</li>
             </ol>
@@ -176,8 +309,8 @@ export const Downloads: React.FC = () => {
               Mac OS (Apple):
             </h3>
             <ol className="space-y-1.5 list-decimal list-inside text-xs sm:text-sm">
-              <li>Download the font file to your Mac Downloads folder.</li>
-              <li>Double-click the downloaded <code>.ttf</code> file.</li>
+              <li>Download the font or ZIP file to your Mac Downloads folder.</li>
+              <li>Double-click the downloaded <code>.ttf</code> file (or extract the ZIP first).</li>
               <li>Font Book will open; click the <strong>Install Font</strong> button.</li>
               <li>The font is now installed across all applications on your Mac!</li>
             </ol>
@@ -190,7 +323,7 @@ export const Downloads: React.FC = () => {
         <div className="flex items-center gap-3">
           <Info className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <p className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-            Need to add more fonts or update existing files? Administrators can upload and customize fonts directly in the Admin Panel.
+            Need to add more fonts or upload ZIP font collections? Administrators can upload single fonts or entire ZIP archives directly in the Admin Panel.
           </p>
         </div>
         <Link

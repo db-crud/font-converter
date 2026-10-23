@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useSiteSettings, type FontItem } from '../context/SiteSettingsContext';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import {
-  Lock,
   LogOut,
   Upload,
   Plus,
@@ -15,9 +15,28 @@ import {
   Info,
   RotateCcw,
   ExternalLink,
-  ShieldCheck
+  ShieldCheck,
+  Archive,
+  Loader2,
+  CheckCircle2,
+  KeyRound,
+  Eye,
+  EyeOff,
+  Lock,
+  User,
+  Image as ImageIcon,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import JSZip from 'jszip';
+import { SiteLogo } from '../components/SiteLogo';
+
+interface ExtractedZipFont {
+  name: string;
+  filename: string;
+  category: FontItem['category'];
+  fileSize: string;
+  dataUrl: string;
+}
 
 export const Admin: React.FC = () => {
   const {
@@ -26,13 +45,13 @@ export const Admin: React.FC = () => {
     contact,
     fonts,
     messages,
-    isAdminAuthenticated,
-    loginAdmin,
     logoutAdmin,
     updateHero,
+    updateLogo,
     updateAbout,
     updateContact,
     addFont,
+    addMultipleFonts,
     deleteFont,
     updateFont,
     markMessageRead,
@@ -40,14 +59,12 @@ export const Admin: React.FC = () => {
     resetAllSettings,
   } = useSiteSettings();
 
+  const { logout, changePassword, credentials } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
 
-  // Auth state
-  const [passwordInput, setPasswordInput] = useState('');
-  const [authError, setAuthError] = useState('');
-
-  // Dashboard active tab: 'overview' | 'fonts' | 'home' | 'about' | 'contact'
-  const [activeTab, setActiveTab] = useState<'overview' | 'fonts' | 'home' | 'about' | 'contact'>('overview');
+  // Dashboard active tab: 'overview' | 'fonts' | 'home' | 'about' | 'contact' | 'settings'
+  const [activeTab, setActiveTab] = useState<'overview' | 'fonts' | 'home' | 'about' | 'contact' | 'settings'>('overview');
 
   // Form states for Home Editor
   const [heroForm, setHeroForm] = useState(hero);
@@ -58,6 +75,15 @@ export const Admin: React.FC = () => {
   // Form states for Contact Editor
   const [contactForm, setContactForm] = useState(contact);
 
+  // Settings / Change Password Form State
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showCurrentPass, setShowCurrentPass] = useState(false);
+  const [showNewPass, setShowNewPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [passwordChangeLoading, setPasswordChangeLoading] = useState(false);
+
   // Font Upload Modal / Form State
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [newFontName, setNewFontName] = useState('');
@@ -65,26 +91,96 @@ export const Admin: React.FC = () => {
   const [newFontDesc, setNewFontDesc] = useState('');
   const [newFontFile, setNewFontFile] = useState<File | null>(null);
 
+  // ZIP Upload & Batch Extraction State
+  const [zipFontEntries, setZipFontEntries] = useState<ExtractedZipFont[]>([]);
+  const [isZipLoading, setIsZipLoading] = useState(false);
+  const [isZipMode, setIsZipMode] = useState(false);
+  const [exportingZip, setExportingZip] = useState(false);
+
   // Font Editing Modal
   const [editingFont, setEditingFont] = useState<FontItem | null>(null);
 
-  // Handle Login
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  // Handle Logout
+  const handleLogout = () => {
+    logout();
+    logoutAdmin();
+    showToast('Logged out of Admin Panel.', 'info');
+    navigate('/login');
+  };
+
+  // Handle Change Password Submit
+  const handleChangePasswordSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (loginAdmin(passwordInput)) {
-      setAuthError('');
-      showToast('Admin login successful!', 'success');
-    } else {
-      setAuthError('Incorrect password. Please use default PIN: admin123');
-      showToast('Invalid admin credentials', 'error');
+    if (!currentPassword) {
+      showToast('Please enter your current password.', 'error');
+      return;
     }
+    if (newPassword.length < 6) {
+      showToast('New password must be at least 6 characters long.', 'error');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      showToast('New password and confirm password do not match.', 'error');
+      return;
+    }
+
+    setPasswordChangeLoading(true);
+    const result = await changePassword(currentPassword, newPassword);
+    setPasswordChangeLoading(false);
+
+    if (result.success) {
+      showToast('Password updated successfully! Please use your new password next time.', 'success');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    } else {
+      showToast(result.message || 'Failed to change password.', 'error');
+    }
+  };
+
+  // Handle Logo Upload (PNG, JPG, SVG, WebP)
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (PNG, JPG, SVG, WebP).', 'error');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      showToast('Logo file should be less than 2MB for optimal performance.', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      setHeroForm((prev) => ({ ...prev, logoUrl: result }));
+      showToast('Logo image selected! Click "Save Logo" to apply changes.', 'info');
+    };
+    reader.onerror = () => {
+      showToast('Failed to load image file.', 'error');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleSaveLogoOnly = () => {
+    updateLogo(heroForm.logoUrl || '');
+    showToast('Website logo updated and saved successfully!', 'success');
+  };
+
+  const handleRemoveLogo = () => {
+    setHeroForm((prev) => ({ ...prev, logoUrl: '' }));
+    updateLogo('');
+    showToast('Custom logo removed. Default logo restored.', 'info');
   };
 
   // Handle Home Save
   const handleSaveHero = (e: React.FormEvent) => {
     e.preventDefault();
     updateHero(heroForm);
-    showToast('Home page content updated successfully!', 'success');
+    showToast('Home page content & logo updated successfully!', 'success');
   };
 
   // Handle About Save
@@ -101,29 +197,142 @@ export const Admin: React.FC = () => {
     showToast('Contact information updated successfully!', 'success');
   };
 
-  // Handle Font File Selection
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle Font File Selection (supports .ttf, .otf, .woff, and .zip)
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       setNewFontFile(file);
-      if (!newFontName) {
-        // Auto fill font name from filename without extension
-        const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-        setNewFontName(cleanName);
+      const isZip = file.name.toLowerCase().endsWith('.zip') || file.type.includes('zip');
+
+      if (isZip) {
+        setIsZipMode(true);
+        setIsZipLoading(true);
+        setZipFontEntries([]);
+
+        try {
+          const zip = await JSZip.loadAsync(file);
+          const entries: ExtractedZipFont[] = [];
+
+          for (const [relativePath, zipEntry] of Object.entries(zip.files)) {
+            if (zipEntry.dir) continue;
+            if (relativePath.includes('__MACOSX') || relativePath.startsWith('.')) continue;
+            const lower = relativePath.toLowerCase();
+
+            if (
+              lower.endsWith('.ttf') ||
+              lower.endsWith('.otf') ||
+              lower.endsWith('.woff') ||
+              lower.endsWith('.woff2')
+            ) {
+              const filename = relativePath.split('/').pop() || relativePath;
+              const baseName = filename.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+
+              // Auto-categorize based on common Nepali font naming
+              let category: FontItem['category'] = 'Traditional';
+              if (lower.includes('unicode') && lower.includes('roman')) {
+                category = 'Romanized';
+              } else if (lower.includes('unicode') || lower.includes('mangal') || lower.includes('kalimati') || lower.includes('gargi')) {
+                category = 'Unicode';
+              } else if (lower.includes('preeti') || lower.includes('kantipur') || lower.includes('sagarmatha') || lower.includes('himali')) {
+                category = 'Traditional';
+              }
+
+              const base64 = await zipEntry.async('base64');
+              const mime = lower.endsWith('.otf')
+                ? 'font/otf'
+                : lower.endsWith('.woff')
+                ? 'font/woff'
+                : lower.endsWith('.woff2')
+                ? 'font/woff2'
+                : 'font/ttf';
+              const dataUrl = `data:${mime};base64,${base64}`;
+
+              const rawLength = (base64.length * 3) / 4;
+              const formattedSize =
+                rawLength > 1024 * 1024
+                  ? `${(rawLength / (1024 * 1024)).toFixed(1)} MB`
+                  : `${(rawLength / 1024).toFixed(1)} KB`;
+
+              entries.push({
+                name: baseName.charAt(0).toUpperCase() + baseName.slice(1),
+                filename,
+                category,
+                fileSize: formattedSize,
+                dataUrl,
+              });
+            }
+          }
+
+          setZipFontEntries(entries);
+          if (entries.length > 0) {
+            showToast(`ZIP loaded! Found ${entries.length} font file(s).`, 'success');
+          } else {
+            showToast(`No font files found inside ZIP. You can publish the ZIP package directly.`, 'info');
+            const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+            setNewFontName(cleanName.charAt(0).toUpperCase() + cleanName.slice(1));
+          }
+        } catch (err) {
+          console.error(err);
+          showToast('Failed to parse ZIP archive', 'error');
+          setZipFontEntries([]);
+        } finally {
+          setIsZipLoading(false);
+        }
+      } else {
+        setIsZipMode(false);
+        setZipFontEntries([]);
+        if (!newFontName) {
+          const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+          setNewFontName(cleanName.charAt(0).toUpperCase() + cleanName.slice(1));
+        }
       }
     }
   };
 
-  // Handle Font Upload / Submit
+  // Import all fonts extracted from the ZIP in one action
+  const handleImportAllFromZip = () => {
+    if (zipFontEntries.length === 0) {
+      showToast('No fonts found to import from this ZIP', 'error');
+      return;
+    }
+
+    const toAdd = zipFontEntries.map((zf) => ({
+      name: zf.name,
+      category: zf.category,
+      description: `${zf.category} Nepali font extracted from ${newFontFile?.name || 'ZIP bundle'}.`,
+      filename: zf.filename,
+      fileUrl: zf.dataUrl,
+      fileSize: zf.fileSize,
+    }));
+
+    addMultipleFonts(toAdd);
+    showToast(`Successfully imported ${toAdd.length} font(s) from ZIP!`, 'success');
+
+    // Reset upload form
+    setNewFontName('');
+    setNewFontDesc('');
+    setNewFontFile(null);
+    setZipFontEntries([]);
+    setIsZipMode(false);
+    setShowUploadModal(false);
+  };
+
+  // Handle Font Upload / Submit (Single font file or single ZIP package)
   const handleAddFontSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isZipMode && zipFontEntries.length > 0) {
+      handleImportAllFromZip();
+      return;
+    }
+
     if (!newFontName) {
       showToast('Please provide a font name', 'error');
       return;
     }
 
     if (!newFontFile) {
-      showToast('Please select a font file (.ttf, .otf, .woff)', 'error');
+      showToast('Please select a font or ZIP file', 'error');
       return;
     }
 
@@ -150,10 +359,69 @@ export const Admin: React.FC = () => {
       setNewFontName('');
       setNewFontDesc('');
       setNewFontFile(null);
+      setZipFontEntries([]);
+      setIsZipMode(false);
       setShowUploadModal(false);
     };
 
     reader.readAsDataURL(newFontFile);
+  };
+
+  // Handle Export All Fonts as a single ZIP archive
+  const handleExportAllZip = async () => {
+    if (fonts.length === 0) {
+      showToast('No fonts available to export', 'error');
+      return;
+    }
+
+    setExportingZip(true);
+    showToast('Creating ZIP archive of all fonts...', 'info');
+
+    try {
+      const zip = new JSZip();
+      const folder = zip.folder('Nepali_Fonts') || zip;
+
+      for (const font of fonts) {
+        if (font.fileUrl.startsWith('data:')) {
+          const parts = font.fileUrl.split(',');
+          if (parts[1]) {
+            folder.file(font.filename, parts[1], { base64: true });
+          }
+        } else {
+          try {
+            const resp = await fetch(font.fileUrl);
+            if (resp.ok) {
+              const blob = await resp.blob();
+              folder.file(font.filename, blob);
+            }
+          } catch (e) {
+            console.warn(`Could not bundle ${font.name}:`, e);
+          }
+        }
+      }
+
+      folder.file(
+        'README.txt',
+        `Nepali Fonts Archive\nExported from Admin Panel\nTotal Fonts: ${fonts.length}\nDate: ${new Date().toLocaleDateString()}`
+      );
+
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const downloadUrl = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `All_Nepali_Fonts_Backup_${new Date().toISOString().split('T')[0]}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(downloadUrl);
+
+      showToast('All fonts exported as ZIP successfully!', 'success');
+    } catch (err) {
+      console.error(err);
+      showToast('Failed to export fonts as ZIP', 'error');
+    } finally {
+      setExportingZip(false);
+    }
   };
 
   // Handle Edit Font Submit
@@ -181,83 +449,42 @@ export const Admin: React.FC = () => {
     }
   };
 
-  // ================= LOGIN SCREEN =================
-  if (!isAdminAuthenticated) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[75vh] px-4 py-12">
-        <div className="w-full max-w-md p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
-          <div className="text-center mb-6">
-            <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center text-white mx-auto shadow-md shadow-emerald-500/20 mb-3">
-              <Lock className="w-7 h-7" />
-            </div>
-            <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white font-heading">
-              Admin Portal
-            </h1>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Font Converter Dashboard & Content Manager
-            </p>
-          </div>
-
-          <form onSubmit={handleLoginSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="admin-pin" className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
-                Admin Password / PIN
-              </label>
-              <input
-                id="admin-pin"
-                type="password"
-                value={passwordInput}
-                onChange={(e) => setPasswordInput(e.target.value)}
-                placeholder="Enter password..."
-                className="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
-                autoFocus
-              />
-              {authError && <p className="mt-1.5 text-xs text-rose-500 font-medium">{authError}</p>}
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-2.5 px-4 text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 transition-all active:scale-95"
-            >
-              Sign In to Dashboard
-            </button>
-          </form>
-
-          {/* Helper hint */}
-          <div className="mt-6 p-3.5 rounded-xl bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-xs text-slate-600 dark:text-slate-300">
-            <p className="font-semibold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5 mb-1">
-              <ShieldCheck className="w-4 h-4" /> Default Admin Password:
-            </p>
-            <p className="font-mono bg-white dark:bg-slate-900 px-2 py-1 rounded border border-emerald-200 dark:border-emerald-800/80 text-emerald-700 dark:text-emerald-400 font-bold inline-block">
-              admin123
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // ================= LOGGED IN DASHBOARD =================
   const totalDownloads = fonts.reduce((sum, f) => sum + f.downloadCount, 0);
   const unreadMessagesCount = messages.filter((m) => !m.read).length;
 
   return (
     <div className="flex flex-col min-h-screen py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Top Admin Header Bar */}
+      {/* Top Admin Header Bar with Logo on left and 'Admin Panel' underneath */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm mb-8">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-              Admin Session Active
+        <div className="flex flex-col items-start gap-1">
+          {/* Logo matching main navbar */}
+          <Link
+            to="/"
+            className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 rounded-lg p-0.5"
+            title="Go to Home"
+          >
+            <SiteLogo className="w-10 h-10 group-hover:scale-105 transition-transform duration-200" />
+            <div className="flex flex-col">
+              <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white font-heading leading-tight">
+                Font Converter
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                Preeti ↔ Unicode
+              </span>
+            </div>
+          </Link>
+
+          {/* 'Admin Panel' written beneath the logo */}
+          <div className="flex items-center gap-2 pl-0.5 mt-0.5">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 px-2.5 py-0.5 rounded-md inline-block">
+              Admin Panel
+            </span>
+            <span className="flex items-center gap-1.5 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              Active Session
             </span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white font-heading">
-            Admin Control Center
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-            Manage fonts, customize site content in real time, and inspect incoming feedback.
-          </p>
         </div>
 
         <div className="flex items-center flex-wrap gap-2.5">
@@ -280,7 +507,7 @@ export const Admin: React.FC = () => {
           </button>
 
           <button
-            onClick={logoutAdmin}
+            onClick={handleLogout}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl bg-rose-500 hover:bg-rose-600 text-white shadow-xs transition-colors active:scale-95"
           >
             <LogOut className="w-3.5 h-3.5" />
@@ -366,6 +593,18 @@ export const Admin: React.FC = () => {
               {unreadMessagesCount}
             </span>
           )}
+        </button>
+
+        <button
+          onClick={() => setActiveTab('settings')}
+          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+            activeTab === 'settings'
+              ? 'bg-emerald-600 text-white shadow-sm'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <KeyRound className="w-4 h-4" />
+          <span>Security & Password</span>
         </button>
       </div>
 
@@ -472,22 +711,43 @@ export const Admin: React.FC = () => {
               </p>
             </div>
 
-            <button
-              onClick={() => setShowUploadModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-95 transition-all self-start sm:self-auto"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Upload New Font</span>
-            </button>
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={handleExportAllZip}
+                disabled={exportingZip || fonts.length === 0}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-semibold rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-750 transition-colors"
+                title="Download all fonts packaged into a ZIP archive"
+              >
+                {exportingZip ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-emerald-600" />
+                ) : (
+                  <Archive className="w-4 h-4 text-emerald-600" />
+                )}
+                <span>Export All as ZIP</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowUploadModal(true);
+                  setIsZipMode(false);
+                  setZipFontEntries([]);
+                  setNewFontFile(null);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-95 transition-all self-start sm:self-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Upload Fonts / ZIP</span>
+              </button>
+            </div>
           </div>
 
-          {/* Upload New Font Modal / Box */}
+          {/* Upload New Font / ZIP Modal Box */}
           {showUploadModal && (
             <div className="p-6 rounded-2xl bg-emerald-50/50 dark:bg-slate-850 border border-emerald-300 dark:border-emerald-800 shadow-md">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
                   <Upload className="w-5 h-5 text-emerald-600" />
-                  <span>Upload & Publish Font Package</span>
+                  <span>Upload Fonts (.TTF / .OTF / .ZIP)</span>
                 </h3>
                 <button
                   onClick={() => setShowUploadModal(false)}
@@ -497,90 +757,146 @@ export const Admin: React.FC = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleAddFontSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* Font Name */}
+              {/* File Picker */}
+              <div className="mb-4">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1.5">
+                  Select Font File or ZIP Archive (.ttf, .otf, .woff, .zip) *
+                </label>
+                <input
+                  type="file"
+                  accept=".ttf,.otf,.woff,.woff2,.zip,application/zip,application/x-zip-compressed"
+                  onChange={handleFileChange}
+                  className="w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer"
+                  required
+                />
+                {newFontFile && (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-emerald-800 dark:text-emerald-300 font-medium">
+                    {isZipMode ? <Archive className="w-4 h-4 text-emerald-600 shrink-0" /> : <FileText className="w-4 h-4 text-emerald-600 shrink-0" />}
+                    <span>Selected: <strong>{newFontFile.name}</strong> ({(newFontFile.size / 1024).toFixed(1)} KB)</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Loading ZIP indicator */}
+              {isZipLoading && (
+                <div className="p-6 rounded-xl bg-white dark:bg-slate-900 border border-emerald-200 dark:border-emerald-900 flex items-center justify-center gap-3 text-sm text-emerald-700 dark:text-emerald-400 mb-4">
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Analyzing font files inside ZIP archive...</span>
+                </div>
+              )}
+
+              {/* Detected Fonts inside ZIP */}
+              {isZipMode && !isZipLoading && zipFontEntries.length > 0 && (
+                <div className="p-4 rounded-xl bg-white dark:bg-slate-900 border border-emerald-300 dark:border-emerald-800 mb-5 shadow-xs">
+                  <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <div className="flex items-center gap-2">
+                      <Archive className="w-4 h-4 text-emerald-600" />
+                      <span className="font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
+                        Found {zipFontEntries.length} font file(s) in this ZIP:
+                      </span>
+                    </div>
+                    <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                      Ready to bulk import
+                    </span>
+                  </div>
+
+                  <div className="max-h-52 overflow-y-auto space-y-1.5 pr-1 mb-4 divide-y divide-slate-100 dark:divide-slate-800/60">
+                    {zipFontEntries.map((zf, idx) => (
+                      <div key={idx} className="flex items-center justify-between pt-1.5 first:pt-0 text-xs">
+                        <div className="flex items-center gap-2">
+                          <FileText className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="font-semibold text-slate-800 dark:text-slate-200">{zf.name}</span>
+                          <span className="text-slate-400 font-mono text-[10px]">({zf.filename})</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                            {zf.category}
+                          </span>
+                          <span className="font-mono text-[10px] text-slate-500">{zf.fileSize}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleImportAllFromZip}
+                    className="w-full py-2.5 px-4 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-95 transition-all flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>Extract & Import All ({zipFontEntries.length}) Fonts into Repository</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Single Font or Bundle Form (also applies if single font file is selected or manual override) */}
+              {(!isZipMode || zipFontEntries.length === 0) && (
+                <form onSubmit={handleAddFontSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Font Name */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Font / Package Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={newFontName}
+                        onChange={(e) => setNewFontName(e.target.value)}
+                        placeholder="e.g. Sagarmatha Font, Kalimati, Ritu"
+                        className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                        required
+                      />
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
+                        Category *
+                      </label>
+                      <select
+                        value={newFontCategory}
+                        onChange={(e) => setNewFontCategory(e.target.value as any)}
+                        className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                      >
+                        <option value="Traditional">Traditional (Preeti / Kantipur / Legacy)</option>
+                        <option value="Unicode">Unicode Standard</option>
+                        <option value="Romanized">Romanized Layout</option>
+                        <option value="Other">Other Typeface / Bundle</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Description */}
                   <div>
                     <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      Font Name *
+                      Description
                     </label>
-                    <input
-                      type="text"
-                      value={newFontName}
-                      onChange={(e) => setNewFontName(e.target.value)}
-                      placeholder="e.g. Sagarmatha Font, Kalimati, Ritu"
+                    <textarea
+                      rows={2}
+                      value={newFontDesc}
+                      onChange={(e) => setNewFontDesc(e.target.value)}
+                      placeholder="Short description of this font, usage instructions, or origin..."
                       className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                      required
                     />
                   </div>
 
-                  {/* Category */}
-                  <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                      Category *
-                    </label>
-                    <select
-                      value={newFontCategory}
-                      onChange={(e) => setNewFontCategory(e.target.value as any)}
-                      className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  <div className="flex items-center gap-3 pt-2">
+                    <button
+                      type="submit"
+                      className="px-5 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all active:scale-95"
                     >
-                      <option value="Traditional">Traditional (Preeti / Kantipur / Legacy)</option>
-                      <option value="Unicode">Unicode Standard</option>
-                      <option value="Romanized">Romanized Layout</option>
-                      <option value="Other">Other Typeface</option>
-                    </select>
+                      Upload and Publish Font
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowUploadModal(false)}
+                      className="px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+                    >
+                      Cancel
+                    </button>
                   </div>
-                </div>
-
-                {/* File Upload Picker */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                    Select Font File (.ttf, .otf, .woff, .zip) *
-                  </label>
-                  <input
-                    type="file"
-                    accept=".ttf,.otf,.woff,.woff2,.zip"
-                    onChange={handleFileChange}
-                    className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer"
-                    required
-                  />
-                  {newFontFile && (
-                    <p className="mt-1 text-xs text-emerald-700 dark:text-emerald-400 font-medium">
-                      Selected file: {newFontFile.name} ({(newFontFile.size / 1024).toFixed(1)} KB)
-                    </p>
-                  )}
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
-                    Description
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={newFontDesc}
-                    onChange={(e) => setNewFontDesc(e.target.value)}
-                    placeholder="Short description of this font, usage instructions, or origin..."
-                    className="w-full px-3.5 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  />
-                </div>
-
-                <div className="flex items-center gap-3 pt-2">
-                  <button
-                    type="submit"
-                    className="px-5 py-2.5 text-xs sm:text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-all active:scale-95"
-                  >
-                    Upload and Publish Font
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowUploadModal(false)}
-                    className="px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
+                </form>
+              )}
             </div>
           )}
 
@@ -740,7 +1056,105 @@ export const Admin: React.FC = () => {
               Update the hero banner title, subtitle, descriptive text, and organization attribution.
             </p>
 
-            <form onSubmit={handleSaveHero} className="space-y-4">
+            <form onSubmit={handleSaveHero} className="space-y-6">
+              {/* Website Logo Upload Section */}
+              <div className="p-5 rounded-2xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                      <ImageIcon className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                      <span>Website Logo (साइट / कम्पनी लोगो)</span>
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                      Upload custom logo image (PNG, JPG, SVG, WebP). It updates on Navbar, Footer, and Header.
+                    </p>
+                  </div>
+                  {heroForm.logoUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      className="text-xs text-rose-500 hover:text-rose-600 font-semibold flex items-center gap-1 px-2.5 py-1 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
+                      title="Reset to default logo"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Reset Logo</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Logo Preview & Upload Controls */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center pt-1">
+                  {/* Preview Cards */}
+                  <div className="flex items-center gap-3">
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 p-1.5 flex items-center justify-center shadow-xs overflow-hidden">
+                        {heroForm.logoUrl ? (
+                          <img
+                            src={heroForm.logoUrl}
+                            alt="Logo Preview"
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center text-white">
+                            <span className="font-nepali text-2xl font-bold">ने</span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 font-medium">Light UI</span>
+                    </div>
+
+                    <div className="flex flex-col items-center">
+                      <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-700 p-1.5 flex items-center justify-center shadow-xs overflow-hidden">
+                        {heroForm.logoUrl ? (
+                          <img
+                            src={heroForm.logoUrl}
+                            alt="Logo Preview"
+                            className="w-full h-full object-contain"
+                          />
+                        ) : (
+                          <div className="w-full h-full rounded-xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center text-white">
+                            <span className="font-nepali text-2xl font-bold">ने</span>
+                          </div>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-400 mt-1 font-medium">Dark UI</span>
+                    </div>
+
+                    <div className="text-xs text-slate-500 dark:text-slate-400 pl-1">
+                      <div className="font-semibold text-slate-700 dark:text-slate-300">
+                        {heroForm.logoUrl ? 'Custom Logo' : 'Default Logo'}
+                      </div>
+                      <div className="text-[11px] text-slate-400">
+                        {heroForm.logoUrl ? 'Active Image' : 'Gradient (ने)'}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Upload and Save Logo Action */}
+                  <div className="space-y-2">
+                    <label className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed border-emerald-400 dark:border-emerald-600/60 bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 cursor-pointer transition-all text-xs font-bold text-emerald-700 dark:text-emerald-300">
+                      <Upload className="w-4 h-4" />
+                      <span>Choose Logo Image</span>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                      />
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={handleSaveLogoOnly}
+                      className="w-full py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Save Logo</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 mb-1">
                   App Name / Main Heading
@@ -810,9 +1224,10 @@ export const Admin: React.FC = () => {
               <div className="pt-2">
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-95 transition-all"
+                  className="px-6 py-2.5 text-sm font-bold rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm shadow-emerald-600/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
                 >
-                  Save Home Page Content
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>Save Home Page & Logo Settings</span>
                 </button>
               </div>
             </form>
@@ -823,14 +1238,31 @@ export const Admin: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
               Live Home Banner Preview
             </span>
-            <div className="p-8 rounded-3xl bg-gradient-to-b from-emerald-50/60 via-teal-50/20 to-slate-50 dark:from-emerald-950/20 dark:via-slate-950 dark:to-slate-950 border border-slate-200 dark:border-slate-800 text-center">
+            <div className="p-8 rounded-3xl bg-gradient-to-b from-emerald-50/60 via-teal-50/20 to-slate-50 dark:from-emerald-950/20 dark:via-slate-950 dark:to-slate-950 border border-slate-200 dark:border-slate-800 text-center flex flex-col items-center">
+              {/* Dynamic Logo in Preview */}
+              <div className="mb-4">
+                {heroForm.logoUrl ? (
+                  <div className="w-16 h-16 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 p-1.5 flex items-center justify-center shadow-md overflow-hidden">
+                    <img
+                      src={heroForm.logoUrl}
+                      alt="Logo"
+                      className="w-full h-full object-contain"
+                    />
+                  </div>
+                ) : (
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-cyan-700 flex items-center justify-center text-white shadow-md shadow-emerald-500/20">
+                    <span className="font-nepali text-2xl font-bold">ने</span>
+                  </div>
+                )}
+              </div>
+
               <h2 className="text-3xl font-extrabold text-slate-900 dark:text-white font-heading">
                 {heroForm.title || 'Font Converter'}
               </h2>
               <p className="mt-3 text-base font-semibold text-emerald-700 dark:text-emerald-400">
                 {heroForm.subtitle}
               </p>
-              <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+              <p className="mt-3 text-sm text-slate-600 dark:text-slate-300 leading-relaxed max-w-md">
                 {heroForm.description}
               </p>
               <div className="mt-4 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 dark:bg-slate-900/90 border border-emerald-200 dark:border-emerald-800 text-xs font-medium text-slate-700 dark:text-slate-200">
@@ -1106,6 +1538,226 @@ export const Admin: React.FC = () => {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ================= TAB 6: SECURITY & SETTINGS ================= */}
+      {activeTab === 'settings' && (
+        <div className="space-y-8 max-w-4xl">
+          {/* Header banner */}
+          <div className="p-6 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shrink-0">
+                <ShieldCheck className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold font-heading">Admin Account & Security Settings</h2>
+                <p className="text-emerald-100 text-xs sm:text-sm mt-0.5">
+                  Manage your credentials, change your login password, and secure your admin dashboard.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-xl text-xs font-semibold backdrop-blur-sm transition-all flex items-center gap-2 border border-white/20"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>Log Out Admin</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {/* Account Info Card */}
+            <div className="md:col-span-1 space-y-6">
+              <div className="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-4 flex items-center gap-2">
+                  <User className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                  Account Details
+                </h3>
+
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="text-slate-400 font-medium block mb-1">Username</label>
+                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-mono font-semibold text-slate-800 dark:text-slate-200">
+                      {credentials?.username || 'admin'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 font-medium block mb-1">Registered Email</label>
+                    <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 font-mono text-slate-700 dark:text-slate-300 break-all">
+                      {credentials?.email || 'dbsthakuree123@gmail.com'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-slate-400 font-medium block mb-1">Access Role</label>
+                    <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      Full Administrator
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                      You can log in from the login page using either your username <span className="font-semibold text-slate-700 dark:text-slate-300">({credentials?.username || 'admin'})</span> or your email address in a single step.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Security Hint */}
+              <div className="p-5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-amber-900 dark:text-amber-200 text-xs space-y-2">
+                <div className="font-bold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+                  <Lock className="w-3.5 h-3.5" />
+                  Security Notice
+                </div>
+                <p className="text-[11px] leading-relaxed text-amber-800/90 dark:text-amber-300/80">
+                  When you update your password here, it saves securely to this device immediately. Keep your new password remembered or written in a safe place.
+                </p>
+              </div>
+            </div>
+
+            {/* Change Password Form */}
+            <div className="md:col-span-2">
+              <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="flex items-center gap-3 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+                    <KeyRound className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900 dark:text-white">Change Admin Password</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Update your password to prevent unauthorized access to the admin dashboard.
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleChangePasswordSubmit} className="space-y-5">
+                  {/* Current Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Current Password <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showCurrentPass ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="Enter your current password"
+                        required
+                        className="w-full px-4 py-2.5 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowCurrentPass(!showCurrentPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        title={showCurrentPass ? 'Hide password' : 'Show password'}
+                      >
+                        {showCurrentPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    <span className="text-[11px] text-slate-400 mt-1 block">
+                      Default initial password is <code className="bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded text-emerald-600 dark:text-emerald-400 font-mono">admin123</code> (if not changed yet).
+                    </span>
+                  </div>
+
+                  {/* New Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                      New Password <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showNewPass ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Enter new strong password"
+                        required
+                        minLength={4}
+                        className="w-full px-4 py-2.5 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowNewPass(!showNewPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        title={showNewPass ? 'Hide password' : 'Show password'}
+                      >
+                        {showNewPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm New Password */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                      Confirm New Password <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showConfirmPass ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Re-enter new password"
+                        required
+                        minLength={4}
+                        className={`w-full px-4 py-2.5 pr-11 rounded-xl bg-slate-50 dark:bg-slate-950 border text-slate-900 dark:text-white text-sm focus:outline-none focus:ring-2 transition-all font-mono ${
+                          confirmPassword && newPassword !== confirmPassword
+                            ? 'border-rose-400 focus:ring-rose-500'
+                            : 'border-slate-200 dark:border-slate-800 focus:ring-emerald-500'
+                        }`}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPass(!showConfirmPass)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        title={showConfirmPass ? 'Hide password' : 'Show password'}
+                      >
+                        {showConfirmPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                    {confirmPassword && newPassword !== confirmPassword && (
+                      <span className="text-[11px] text-rose-500 font-medium mt-1 block">
+                        Passwords do not match.
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Submit Button */}
+                  <div className="pt-4 flex items-center justify-end gap-3">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCurrentPassword('');
+                        setNewPassword('');
+                        setConfirmPassword('');
+                      }}
+                      className="px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all"
+                    >
+                      Clear
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={passwordChangeLoading || !currentPassword || !newPassword || newPassword !== confirmPassword}
+                      className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                    >
+                      {passwordChangeLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>Updating Password...</span>
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Update Password</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       )}
